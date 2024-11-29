@@ -67,3 +67,52 @@ class Practice:
     def __repr__(self):
         return (f"Practice(ID={self.identifier}, AssociatedGame={self.associated_game}, "
                 f"Type={self.type}, AssignedSlot={self.assigned_slot})")
+    
+
+    from typing import List, Dict, Optional
+
+class State:
+    """
+    Represents a state in the scheduling process.
+    A state is a mapping of slots to assigned games and practices.
+    """
+    def __init__(self, slots: List[Slot]):
+        self.slots = {slot: {"games": [], "practices": []} for slot in slots}
+
+    def assign_game(self, game: Game, slot: Slot) -> bool:
+        """
+        Assigns a game to a slot if constraints are met.
+        Returns True if assignment is successful, False otherwise.
+        """
+        if len(self.slots[slot]["games"]) < slot.max_games:
+            self.slots[slot]["games"].append(game.identifier)
+            game.assign_slot(slot)
+            return True
+        return False
+
+    def assign_practice(self, practice: Practice, slot: Slot) -> bool:
+        """
+        Assigns a practice to a slot if constraints are met.
+        Returns True if assignment is successful, False otherwise.
+        """
+        if len(self.slots[slot]["practices"]) < slot.max_practices:
+            self.slots[slot]["practices"].append(practice.identifier)
+            practice.assign_slot(slot)
+            return True
+        return False
+
+    def is_valid(self) -> bool:
+        """
+        Validates the state to ensure all slots respect their constraints.
+        """
+        for slot, assignments in self.slots.items():
+            if len(assignments["games"]) > slot.max_games:
+                return False
+            if len(assignments["practices"]) > slot.max_practices:
+                return False
+        return True
+
+    def __repr__(self):
+        return f"State(Slots={self.slots})"
+
+
