@@ -13,13 +13,18 @@ class Slot:
         self.min_practices = min_practices
         self.assigned_games: List[str] = []
         self.assigned_practices: List[str] = []
+
+    def get_assigned_games(self):
+        return self.assigned_games
+
+    def get_assigned_practices(self):
+        return self.assigned_practices
     
     def __repr__(self):
         return (f"Slot(Day={self.day}, StartTime={self.start_time}, "
                 f"MaxGames={self.max_games}, MinGames={self.min_games}, "
                 f"MaxPractices={self.max_practices}, MinPractices={self.min_practices}, "
                 f"AssignedGames={self.assigned_games}, AssignedPractices={self.assigned_practices})")
-
 
 class Game:
     """
@@ -71,9 +76,25 @@ class Practice:
 
     from typing import List, Dict, Optional
 
+def get_total_games_assigned(slot_list: List[Slot]) -> int:
+    num_games_assigned_total = 0
+
+    for Slot in slot_list:
+        num_games_assigned_total += len(Slot.assigned_games)
+
+    return num_games_assigned_total
+
+def get_total_practices_assigned(slot_list: List[Slot]) -> int:
+    num_practices_assigned_total = 0
+
+    for Slot in slot_list:
+        num_practices_assigned_total += len(Slot.assigned_practices)
+
+    return num_practices_assigned_total
+
 class State:
     """
-    Represents a state in the scheduling process.
+    This represents the initial state.
     A state is a mapping of slots to assigned games and practices.
     """
     def __init__(self, slots: List[Slot]):
@@ -112,7 +133,23 @@ class State:
                 return False
         return True
 
+    def is_goal_state(self, games, practices, slot_list: List[Slot]) -> bool:
+        """
+        This returns whether the state has all the games and practices in the input assigned to a time slot 
+        or all the time slots are filled to max
+        """
+        if len(games) == get_total_games_assigned() and len(practices) == get_total_practices_assigned():
+            return True
+        
+        max = 0
+        for slot in slot_list:
+            max = max + slot.max_games + slot.max_practices
+        if max == get_total_games_assigned() + get_total_practices_assigned():
+            return True     
+
+        return False   
+
     def __repr__(self):
         return f"State(Slots={self.slots})"
-
+    
 
