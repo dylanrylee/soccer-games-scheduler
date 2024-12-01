@@ -14,13 +14,10 @@ class SearchProcess:
         self.soft_constraints = soft_constraints
     
     """
-    Decides which of the AndTreeNodes children to expand and expands the AndTree Node
+    Decides which of the current_node children to expand and returns the best child
     """
-    def f_leaf(self, games: List[Game], practices: List[Practice]) -> Union[Game, Practice]:
-        
-        best_game = Game
-        best_practice =  Practice
-        
+    def f_leaf(current_node: AndTreeNode):
+
         "Eval is what is used to find score based from the soft constraints"
         for AndTreeNode in self.root.children:
             for game in games:
@@ -41,35 +38,17 @@ class SearchProcess:
         else: 
             f_select(self, best_game, best_practice)
 
-class Ftrans:
-    def __init__(self, root: AndTreeNode):
-        self.root = root # This is the root of the set of leaves
-
-    def f_trans(self) -> AndTreeNode:
-        """
-        This function makes the transition to the state that has the lowest eval score
-        within the current nodes' leaves set
-        """
+    """
+    
+    """
+    def f_select(self, option_1: Union[Game, Practice],option_2 :Union[Game, Practice]) -> Union[Game, Practice]:
         
-        current_state = self.root
-
-        # List of the current state's children
-        next_states = self.root.children
-
-        # This takes the state with the lowest eval value
-        min_state = min(next_states, key=eval)
-            
-        # If the child state of the current state has the same eval
-        if (eval(min_state) <= eval(current_state)):
-            return min_state
+        return
     
     
-class Fbound:
-
-    def __init__(self, root: AndTreeNode, threshold=0.4):
-        self.root = root # This is the root of the set of leaves
-        self.threshold = threshold
-
+    """
+    
+    """
     def f_bound(self):
 
         L = self.root.children
