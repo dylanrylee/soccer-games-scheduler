@@ -1,6 +1,5 @@
 from typing import List, Tuple
 from scheduler_structures import *
-from hard_constraints import *
 from AndTreeNode import *
 import math
 
@@ -19,36 +18,38 @@ class SearchProcess:
     def f_leaf(current_node: AndTreeNode):
 
         "Eval is what is used to find score based from the soft constraints"
-        for AndTreeNode in self.root.children:
-            for game in games:
-                if Eval(self, game) > Eval(self, best_game):
-                    best_game = game
-                elif Eval(self, game) == Eval(self, best_game):
-                    best_game = f_select(self, game, best_game)
-            for practice in practices:
-                if Eval(practice) > Eval(best_practice):
-                    best_practice = practice
-                elif Eval(practice) == Eval(best_practice):
-                    best_practice = f_select(self, practice, best_practice)
-        
-        if Eval(self, best_game) > Eval(self, best_practice):
-            self.root.expand(best_game)
-        elif Eval(self, best_game) < Eval(self, best_practice):
-            self.root.expand(best_practice)
-        else: 
-            f_select(self, best_game, best_practice)
+        node_to_expand : AndTreeNode = None
 
-    """
-    
-    """
-    def f_select(self, option_1: Union[Game, Practice],option_2 :Union[Game, Practice]) -> Union[Game, Practice]:
+        "Checks every leaf in node and finds the node that is has the lowest evaluation score"
+        for node in current_node.children:
+            if node_to_expand == None or eval(node) < eval(node_to_expand): 
+                node_to_expand = node
+
+        return node_to_expand
+
+class Ftrans:
+    def __init__(self, root: AndTreeNode):
+        self.root = root # This is the root of the set of leaves
+
+    def f_trans(self) -> AndTreeNode:
+        """
+        This function makes the transition to the state that has the lowest eval score
+        within the current nodes' leaves set
+        """
         
-        return
-    
-    
-    """
-    
-    """
+        current_state = self.root
+
+        # List of the current state's children
+        next_states = self.root.children
+
+        # This takes the state with the lowest eval value
+        min_state = min(next_states, key=eval)
+            
+        # If the child state of the current state has the same eval
+        if (eval(min_state) <= eval(current_state)):
+            return min_state
+
+class Fbound:
     def f_bound(self):
 
         L = self.root.children
