@@ -27,7 +27,6 @@ class Slot:
                 f"MaxPractices={self.max_practices}, MinPractices={self.min_practices}, "
                 f"AssignedGames={self.assigned_games}, AssignedPractices={self.assigned_practices})")
 
-# might change this one, since we only need league, tier, division, 
 class Game:
     """
     Represents a game (g ∈ G).
@@ -52,16 +51,16 @@ class Game:
         return (f"Game(ID={self.identifier}, League={self.league}, AgeGroup={self.age_group}, "
                 f"Tier={self.tier}, Division={self.division}, AssignedSlot={self.assigned_slot})")
 
-# might change, since we only need league, tier, division, practice 
 class Practice:
     """
     Represents a practice (p ∈ P).
     """
-    def __init__(self, league: str, tier: str, division: str, practice: str):
-        self.league = league      # Game ID that this practice is linked to
-        self.tier = tier
-        self.division = division
-        self.practice = practice
+    def __init__(self, identifier: str, associated_game: Optional[str], type_: str):
+        self.identifier = identifier                # Unique practice identifier
+        self.associated_game = associated_game      # Game ID that this practice is linked to
+        self.type = type_
+        self.assigned_slot: Optional[Slot] = None
+        self.constraints: List[Union[str, Slot]] = []
 
     def assign_slot(self, slot: Slot):
         """
