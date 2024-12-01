@@ -13,44 +13,27 @@ class SearchProcess:
         self.soft_constraints = soft_constraints
     
     """
-    Decides which of the AndTreeNodes children to expand and expands the AndTree Node
+    Decides which of the current_node children to expand and returns the best child
     """
-    def f_leaf(self, games: List[Game], practices: List[Practice]) -> Union[Game, Practice]:
-        
-        best_game = Game
-        best_practice =  Practice
-        
-        "Eval is what is used to find score based from the soft constraints"
-        for AndTreeNode in self.root.children:
-            for game in games:
-                if Eval(self, game) > Eval(self, best_game):
-                    best_game = game
-                elif Eval(self, game) == Eval(self, best_game):
-                    best_game = f_select(self, game, best_game)
-            for practice in practices:
-                if Eval(practice) > Eval(best_practice):
-                    best_practice = practice
-                elif Eval(practice) == Eval(best_practice):
-                    best_practice = f_select(self, practice, best_practice)
-        
-        if Eval(self, best_game) > Eval(self, best_practice):
-            self.root.expand(best_game)
-        elif Eval(self, best_game) < Eval(self, best_practice):
-            self.root.expand(best_practice)
-        else: 
-            f_select(self, best_game, best_practice)
+    def f_leaf(current_node: AndTreeNode):
 
-    """
-    
-    """
-    def f_select(self, option_1: Union[Game, Practice],option_2 :Union[Game, Practice]) -> Union[Game, Practice]:
+        "Eval is what is used to find score based from the soft constraints"
+        node_to_expand : AndTreeNode = None
         
-        return
-    
-    
+        "Checks every leaf in node and finds the node that is has the lowest evaluation score"
+        for node in current_node.children:
+            if node_to_expand == None or eval(node) < eval(node_to_expand): 
+                node_to_expand = node
+                    
+        return node_to_expand
     """
     
     """
+    def f_trans(self) -> AndTreeNode:
+
+    
+    
+
     def f_bound(self):
 
         return
