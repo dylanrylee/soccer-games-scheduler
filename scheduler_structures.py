@@ -94,7 +94,7 @@ def get_total_practices_assigned(slot_list: List[Slot]) -> int:
 
 class State:
 
-    def __init__(self, slots: List[Slot], hard_constraints: HardConstraints):
+    def __init__(self, slots: List[Slot]):
         """
         For each slot in the List[Slot], we initialize each slot with 0 games and practices
         """
@@ -128,7 +128,7 @@ class State:
         """
         for slot, assignments in self.slots.items():
             if len(assignments["games"]) > slot.max_games:
-                return False
+                return False  
             if len(assignments["practices"]) > slot.max_practices:
                 return False
         return True

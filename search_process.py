@@ -2,6 +2,7 @@ from typing import List, Tuple
 from scheduler_structures import *
 from hard_constraints import *
 from AndTreeNode import *
+import math
 
 class SearchProcess:
     """
@@ -40,17 +41,49 @@ class SearchProcess:
         else: 
             f_select(self, best_game, best_practice)
 
-    """
-    
-    """
-    def f_select(self, option_1: Union[Game, Practice],option_2 :Union[Game, Practice]) -> Union[Game, Practice]:
+class Ftrans:
+    def __init__(self, root: AndTreeNode):
+        self.root = root # This is the root of the set of leaves
+
+    def f_trans(self) -> AndTreeNode:
+        """
+        This function makes the transition to the state that has the lowest eval score
+        within the current nodes' leaves set
+        """
         
-        return
+        current_state = self.root
+
+        # List of the current state's children
+        next_states = self.root.children
+
+        # This takes the state with the lowest eval value
+        min_state = min(next_states, key=eval)
+            
+        # If the child state of the current state has the same eval
+        if (eval(min_state) <= eval(current_state)):
+            return min_state
     
     
-    """
-    
-    """
+class Fbound:
+
+    def __init__(self, root: AndTreeNode, threshold=0.4):
+        self.root = root # This is the root of the set of leaves
+        self.threshold = threshold
+
     def f_bound(self):
 
-        return
+        L = self.root.children
+
+        # This is the cutoff of the fbound
+        cutoff = math.ceil(len(L) * (1-self.threshold))
+
+        # this sorts the leaves by their evaluation function value, in reverse order.
+        # So Eval(l_1) >= ... >= Eval(l_n)
+        # Then we are deleting the first 40% of L, so only return the next 60%
+        # If there is only one leaf, then don't delete the first 40%
+        if len(L) == 1:
+            sorted_L = sorted(L, key=eval, reverse=True)
+        else:
+            sorted_L = sorted(L, key=eval, reverse=True)[cutoff:]
+
+        return sorted_L
