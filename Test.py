@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from sheduler_structures import *
+from scheduler_structures import *
 from hard_constraints import *
 from AndTreeNode import AndTreeNode
 from search_instance import SearchInstance

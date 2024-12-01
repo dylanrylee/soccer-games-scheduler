@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from sheduler_structures import *
+from scheduler_structures import *
 
 class HardConstraints:
     def __init__(self, games: List[Game], practices: List[Practice],
