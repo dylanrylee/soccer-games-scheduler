@@ -12,6 +12,7 @@ class AndTreeNode:
         self.practices = practices
         self.depth = depth
         self.children = []  # Subtrees for further exploration
+        self.parent: AndTreeNode
 
     def expand(self, constraints: HardConstraints):
         """
@@ -51,5 +52,55 @@ class AndTreeNode:
                     if constraints.constr(new_node):  # Stop if constraints are satisfied
                         self.children.append(new_node)
 
+        """
+        Assigns a game to a slot if constraints are met.
+        Returns True if assignment is successful, False otherwise.
+        """
+    def assign_game(self, game: Game, slot: Slot) -> bool:
+        if HardConstraints.enforce_game_max(self.slots[slot]["games"]):
+            self.slots[slot]["games"].append(game.identifier)
+            game.assign_slot(slot)
+            return True
+        return False
+
+    def assign_practice(self, practice: Practice, slot: Slot) -> bool:
+        """
+        Assigns a practice to a slot if constraints are met.
+        Returns True if assignment is successful, False otherwise.
+        """
+        if len(self.slots[slot]["practices"]) < slot.max_practices:
+            self.slots[slot]["practices"].append(practice.identifier)
+            practice.assign_slot(slot)
+            return True
+        return False
+
+    def is_valid(self) -> bool:
+        """
+        Validates the state to ensure all slots respect their constraints.
+        """
+        for slot, assignments in self.slots.items():
+            if len(assignments["games"]) > slot.max_games:
+                return False  
+            if len(assignments["practices"]) > slot.max_practices:
+                return False
+        return True
+
+    def is_complete_schedule(self, games: List[Game], practices: List[Practice], slot_list: List[Slot]) -> bool:
+        """
+        This returns whether the state has all the games and practices in the input assigned to a time slot
+        or all the time slots are filled to max
+        """
+        total_games_assigned = sum(len(assignments["games"]) for assignments in self.slots.values())
+        total_practices_assigned = sum(len(assignments["practices"]) for assignments in self.slots.values())
+
+        if len(games) == total_games_assigned and len(practices) == total_practices_assigned:
+            return True
+
+        max_capacity = sum(slot.max_games + slot.max_practices for slot in slot_list)
+        if max_capacity == total_games_assigned + total_practices_assigned:
+            return True
+
+        return False
+    
     def __repr__(self):
         return f"AndTreeNode(Depth={self.depth}, Slots={self.slots}, Games={self.games}, Practices={self.practices})"
