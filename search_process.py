@@ -3,7 +3,7 @@ from scheduler_structures import *
 from AndTreeNode import *
 import math
 
-class SearchProcess:
+class Fleaf:
     """
     Handles the search process for finding feasible scheduling solutions.
     """
@@ -15,19 +15,22 @@ class SearchProcess:
     """
     Decides which of the current_node children to expand and returns the best child
     """
-    def f_leaf(current_node: AndTreeNode):
+    def f_leaf(current_node: List[AndTreeNode]):
 
         "Eval is what is used to find score based from the soft constraints"
         node_to_expand : AndTreeNode = None
 
         "Checks every leaf in node and finds the node that is has the lowest evaluation score"
-        for node in current_node.children:
+        for node in current_node:
             if node_to_expand == None or eval(node) < eval(node_to_expand): 
                 node_to_expand = node
 
         return node_to_expand
 
 class Ftrans:
+    """
+    
+    """
     def __init__(self, root: AndTreeNode):
         self.root = root # This is the root of the set of leaves
 
@@ -39,17 +42,17 @@ class Ftrans:
         
         current_state = self.root
 
-        # List of the current state's children
-        next_states = self.root.children
-
-        # This takes the state with the lowest eval value
-        min_state = min(next_states, key=eval)
+        chosen_leaf = Fleaf.f_leaf(current_state.children)
             
         # If the child state of the current state has the same eval
-        if (eval(min_state) <= eval(current_state)):
-            return min_state
+        if (eval(chosen_leaf) <= eval(current_state)):
+            return chosen_leaf
 
 class Fbound:
+
+    def __init__(self, root: AndTreeNode):
+        self.root = root # This is the root of the set of leaves
+
     def f_bound(self):
 
         L = self.root.children
@@ -67,3 +70,24 @@ class Fbound:
             sorted_L = sorted(L, key=eval, reverse=True)[cutoff:]
 
         return sorted_L
+    
+
+def main():
+
+    # Create the initial state (root node)
+    root_node = AndTreeNode(slots, games, practices, depth=0)
+
+    # Initialize the classes
+    threshold = 0.6  # Example threshold value
+    fbound = Fbound(root_node, threshold)
+    fleaf = Fleaf(root_node, hard_constraints, soft_constraints)
+    ftrans = Ftrans(root_node)
+
+    # Apply fbound to filter the leaves
+    filtered_leaves = fbound.f_bound()
+
+    # Apply fleaf to select the best leaf from the filtered leaves
+    best_leaf = fleaf.f_leaf(filtered_leaves)
+
+    # Apply ftrans to transition to the selected leaf
+    new_state = ftrans.f_trans()

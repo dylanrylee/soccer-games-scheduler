@@ -124,6 +124,9 @@ if __name__ == "__main__":
         slot = Slot(day, time, int(max_games), int(max_practices))
         main.add_partial_assignment(identifier, slot)
 
+    
+
+
     # Assign games and practices to slots
     main.assign_games_to_slots()
     main.assign_practices_to_slots()
