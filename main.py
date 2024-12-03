@@ -1,5 +1,5 @@
 from scheduler_structures import *
-from typing import Dict
+from typing import Dict, Tuple
 
 
 class Main:
@@ -47,23 +47,6 @@ class Main:
             else:
                 print(f"Failed to assign {practice.identifier} to any slot.")
 
-    def display_schedule(self):
-        print("Game Slots:")
-        for slot in self.game_slots:
-            print(slot)
-        print("Practice Slots:")
-        for slot in self.practice_slots:
-            print(slot)
-
-    def is_valid_schedule(self) -> bool:
-        for slot in self.game_slots:
-            if len(slot.assigned_games) > slot.max_games:
-                return False
-        for slot in self.practice_slots:
-            if len(slot.assigned_practices) > slot.max_practices:
-                return False
-        return True
-
 def read_file(file_path: str) -> str:
     with open(file_path, 'r') as file:
         return file.read()
@@ -82,7 +65,7 @@ def parse_sections(content: str):
 if __name__ == "__main__":
 
     # Read the file content
-    file_content = read_file('input.txt')
+    file_content = read_file('C:/Users/dylan/OneDrive/Desktop/AIProject/CPSC433F24-LargeInput1.txt')
 
     # Parse the sections
     parsed_data = parse_sections(file_content)
@@ -124,12 +107,8 @@ if __name__ == "__main__":
         slot = Slot(day, time, int(max_games), int(max_practices))
         main.add_partial_assignment(identifier, slot)
 
-    
-
 
     # Assign games and practices to slots
     main.assign_games_to_slots()
     main.assign_practices_to_slots()
 
-    # Display the schedule
-    main.display_schedule()

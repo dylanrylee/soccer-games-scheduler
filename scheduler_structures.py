@@ -1,5 +1,4 @@
 from typing import List, Optional, Union
-from hard_constraints import *
 
 class Slot:
     """

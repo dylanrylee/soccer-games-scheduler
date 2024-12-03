@@ -2,8 +2,7 @@ from typing import List, Tuple
 from scheduler_structures import *
 from hard_constraints import *
 from AndTreeNode import AndTreeNode
-from search_instance import SearchInstance
-from search_process import SearchProcess
+from search_process import *
 
 # Define slots, games, practices, and constraints
 slots = [Slot("MO", "10:00", 3, 1, 2, 1), Slot("TU", "14:00", 2, 1, 1, 0)]
@@ -14,7 +13,6 @@ constraints = HardConstraints(games, practices, slots, [], [], [], debug=True)
 
 # Create initial state and search process
 root_node = AndTreeNode(slots, games, practices, 0)
-search_instance = SearchInstance(slots, games, practices, constraints)
 search_process = SearchProcess(root_node, constraints)
 
 # Start the search
