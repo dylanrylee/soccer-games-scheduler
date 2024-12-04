@@ -184,11 +184,9 @@ if __name__ == "__main__":
         slot = main.find_slot(day, start_time)
         main.add_partial_assignment(identifier, slot)
     
-    hard_constraints = HardConstraints(main.games, main.practices, main.slots,
-                                       main.not_compatible, main.partial_assignments,
+    hard_constraints = HardConstraints(main.not_compatible, main.partial_assignments,
                                        main.unwanted, False)
-    soft_constraints = SoftConstraints(main.games, main.practices, main.slots,
-                                       pen_game_min, pen_practice_min, w_min_filled,
+    soft_constraints = SoftConstraints(pen_game_min, pen_practice_min, w_min_filled,
                                        main.slot_preferences, w_pref, main.pairs,
                                        pen_not_paired, w_pair, pen_section, w_sec_diff)
     

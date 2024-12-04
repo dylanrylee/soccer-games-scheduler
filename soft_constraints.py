@@ -2,14 +2,10 @@ from typing import List, Tuple
 from scheduler_structures import *
 
 class SoftConstraints:
-    def __init__(self, games: List[Game], practices: List[Practice],
-                 slots: List[Slot], pen_game_min: int, pen_practice_min: int, w_min_filled: int,
+    def __init__(self, pen_game_min: int, pen_practice_min: int, w_min_filled: int,
                  slot_pref: List[Tuple[str, str, str, str]], w_pref: int,
                  pair_pref: List[Tuple[str, str]], pen_not_paired: int, w_pair: int,
                  pen_section: int, w_sec_diff: int):
-        self.games = games
-        self.practices = practices
-        self.slots = slots
         self.pen_game_min = pen_game_min
         self.pen_practice_min = pen_practice_min
         self.w_min_filled = w_min_filled
@@ -21,15 +17,14 @@ class SoftConstraints:
         self.pen_section = pen_section
         self.w_sec_diff = w_sec_diff
 
-    def eval(self):
-        return (SoftConstraints.consider_minimum_assignment(self.slots, self.pen_game_min, self.pen_practice_min) * self.w_min_filled +
-                SoftConstraints.consider_slot_preference(self.slots, self.slot_pref) * self.w_pref +
-                SoftConstraints.consider_pair_preference(self.slots, self.pair_pref, self.pen_not_paired) * self.w_pair +
-                SoftConstraints.consider_city_soft_constraints(self.games, self.pen_section) * self.w_sec_diff)
+    def eval(self, games: List[Game], practices: List[Practice], slots: List[Slot]):
+        return (SoftConstraints.consider_minimum_assignment(slots, self.pen_game_min, self.pen_practice_min) * self.w_min_filled +
+                SoftConstraints.consider_slot_preference(slots, self.slot_pref) * self.w_pref +
+                SoftConstraints.consider_pair_preference(slots, self.pair_pref, self.pen_not_paired) * self.w_pair +
+                SoftConstraints.consider_city_soft_constraints(games, self.pen_section) * self.w_sec_diff)
     
     def __repr__(self):
-        return (f"SoftConstraints(Games={self.games}, Practices={self.practices}, "
-                f"Slots={self.slots}, PenGameMin={self.pen_game_min}, "
+        return (f"SoftConstraints(PenGameMin={self.pen_game_min}, "
                 f"penPracticeMin={self.pen_practice_min}, WMinFilled={self.w_min_filled}, "
                 f"SlotPref={self.slot_pref}, WPref={self.w_pref}), "
                 f"PairPref={self.pair_pref}, WPair={self.w_pair}, "

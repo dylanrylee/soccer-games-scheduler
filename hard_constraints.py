@@ -2,30 +2,25 @@ from typing import List, Tuple
 from scheduler_structures import Game, Practice, Slot
 
 class HardConstraints:
-    def __init__(self, games: List[Game], practices: List[Practice],
-                 slots: List[Slot], not_compatible: List[Tuple[str, str]],
+    def __init__(self, not_compatible: List[Tuple[str, str]],
                  part_assign: List[Tuple[Slot, str]], unwanted: List[Tuple[str, Slot]],
                  debug: bool):
-        self.games = games
-        self.practices = practices
-        self.slots = slots
         self.not_compatible = not_compatible        # Both elements of each pair should be game or practice identifiers
         self.part_assign = part_assign              # The pair should include the Slot to enforce, as well as the game or practice identifier string ("$" is ignored).
         self.unwanted = unwanted                    # The pair should include the game or practice identifier string, as well as the Slot to avoid
         self.debug = debug                          # True if you want debug messaging to be printed to the terminal
 
-    def constr(self):
-        return (HardConstraints.enforce_game_max(self.slots, self.debug) and
-            HardConstraints.enforce_practice_max(self.slots, self.debug) and
-            HardConstraints.enforce_no_simultaneous_assignment(self.games, self.practices, self.debug) and
-            HardConstraints.enforce_respect_not_compatible(self.not_compatible, self.slots, self.debug) and
-            HardConstraints.enforce_respect_part_assign(self.slots, self.part_assign, self.debug) and
-            HardConstraints.enforce_respect_unwanted(self.slots, self.unwanted, self.debug) and
-            HardConstraints.enforce_city_hard_constraints(self.slots, self.games, self.practices, self.debug))
+    def constr(self, games: List[Game], practices: List[Practice], slots: List[Slot]):
+        return (HardConstraints.enforce_game_max(slots, self.debug) and
+            HardConstraints.enforce_practice_max(slots, self.debug) and
+            HardConstraints.enforce_no_simultaneous_assignment(games, practices, self.debug) and
+            HardConstraints.enforce_respect_not_compatible(self.not_compatible, slots, self.debug) and
+            HardConstraints.enforce_respect_part_assign(slots, self.part_assign, self.debug) and
+            HardConstraints.enforce_respect_unwanted(slots, self.unwanted, self.debug) and
+            HardConstraints.enforce_city_hard_constraints(slots, games, practices, self.debug))
     
     def __repr__(self):
-        return (f"HardConstraints(Games={self.games}, Practices={self.practices}, "
-                f"Slots={self.slots}, NotCompatible={self.not_compatible}, "
+        return (f"HardConstraints(NotCompatible={self.not_compatible}, "
                 f"PartAssign={self.part_assign}, Unwanted={self.unwanted}, "
                 f"Debug={self.debug})")
 
