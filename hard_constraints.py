@@ -22,7 +22,12 @@ class HardConstraints:
             HardConstraints.enforce_respect_part_assign(self.slots, self.part_assign, self.debug) and
             HardConstraints.enforce_respect_unwanted(self.slots, self.unwanted, self.debug) and
             HardConstraints.enforce_city_hard_constraints(self.slots, self.games, self.practices, self.debug))
-
+    
+    def __repr__(self):
+        return (f"HardConstraints(Games={self.games}, Practices={self.practices}, "
+                f"Slots={self.slots}, NotCompatible={self.not_compatible}, "
+                f"PartAssign={self.part_assign}, Unwanted={self.unwanted}, "
+                f"Debug={self.debug})")
 
     def enforce_game_max(slots: List[Slot], debug: bool):
         if (debug):

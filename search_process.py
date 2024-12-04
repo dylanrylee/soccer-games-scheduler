@@ -1,5 +1,6 @@
 from typing import List, Tuple
 from scheduler_structures import *
+from soft_constraints import *
 from AndTreeNode import *
 import math
 
@@ -72,7 +73,7 @@ class Fbound:
         return sorted_L
     
 
-def search_process(root_node: AndTreeNode, hard_constraints: HardConstraints):
+def SearchProcess(root_node: AndTreeNode, hard_constraints: HardConstraints, soft_constraints: SoftConstraints):
 
     # Create the initial state (root node)
     completed_schdules: List[AndTreeNode] = []

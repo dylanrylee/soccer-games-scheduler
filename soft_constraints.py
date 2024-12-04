@@ -4,7 +4,7 @@ from scheduler_structures import *
 class SoftConstraints:
     def __init__(self, games: List[Game], practices: List[Practice],
                  slots: List[Slot], pen_game_min: int, pen_practice_min: int, w_min_filled: int,
-                 slot_pref: List[Tuple[str, str, str, int]], w_pref: int,
+                 slot_pref: List[Tuple[str, str, str, str]], w_pref: int,
                  pair_pref: List[Tuple[str, str]], pen_not_paired: int, w_pair: int,
                  pen_section: int, w_sec_diff: int):
         self.games = games
@@ -13,7 +13,7 @@ class SoftConstraints:
         self.pen_game_min = pen_game_min
         self.pen_practice_min = pen_practice_min
         self.w_min_filled = w_min_filled
-        self.slot_pref = slot_pref                  # Should be in the format of (identifier, day, start_time, penalty_if_missed)
+        self.slot_pref = slot_pref                  # Should be in the format of (day, start_time, identifier, penalty_if_missed)
         self.w_pref = w_pref
         self.pair_pref = pair_pref                  # Should be the identifiers for the pair
         self.w_pair = w_pair
@@ -26,7 +26,15 @@ class SoftConstraints:
                 SoftConstraints.consider_slot_preference(self.slots, self.slot_pref) * self.w_pref +
                 SoftConstraints.consider_pair_preference(self.slots, self.pair_pref, self.pen_not_paired) * self.w_pair +
                 SoftConstraints.consider_city_soft_constraints(self.games, self.pen_section) * self.w_sec_diff)
-
+    
+    def __repr__(self):
+        return (f"SoftConstraints(Games={self.games}, Practices={self.practices}, "
+                f"Slots={self.slots}, PenGameMin={self.pen_game_min}, "
+                f"penPracticeMin={self.pen_practice_min}, WMinFilled={self.w_min_filled}, "
+                f"SlotPref={self.slot_pref}, WPref={self.w_pref}), "
+                f"PairPref={self.pair_pref}, WPair={self.w_pair}, "
+                f"PenNotPaired={self.pen_not_paired}, PenSection={self.pen_section}, "
+                f"WSecDiff={self.w_sec_diff})")
 
     def consider_minimum_assignment(slots: List[Slot], pen_game_min: int, pen_practice_min: int):
         penalty = 0
@@ -37,13 +45,13 @@ class SoftConstraints:
                 penalty += pen_practice_min * (slot.min_practices - len(slot.assigned_practices))
         return penalty
     
-    def consider_slot_preference(slots: List[Slot], slot_pref: List[Tuple[str, str, str, int]]):
+    def consider_slot_preference(slots: List[Slot], slot_pref: List[Tuple[str, str, str, str]]):
         penalty = 0
         for pref in slot_pref:
             for slot in slots:
-                if (slot.day == pref[1] and slot.start_time == pref[2] and
-                    pref[0] not in slot.assigned_games and pref[0] not in slot.assigned_practices):
-                    penalty += pref[3]
+                if (slot.day == pref[0] and slot.start_time == pref[1] and
+                    pref[2] not in slot.assigned_games and pref[2] not in slot.assigned_practices):
+                    penalty += int(pref[3])
                     break
         return penalty
 
