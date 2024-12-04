@@ -11,20 +11,22 @@ class HardConstraints:
         self.debug = debug                          # True if you want debug messaging to be printed to the terminal
 
     def constr(self, games: List[Game], practices: List[Practice], slots: List[Slot]):
-        return (HardConstraints.enforce_game_max(slots, self.debug) and
+        val = (HardConstraints.enforce_game_max(slots, self.debug) and
             HardConstraints.enforce_practice_max(slots, self.debug) and
             HardConstraints.enforce_no_simultaneous_assignment(games, practices, self.debug) and
             HardConstraints.enforce_respect_not_compatible(self.not_compatible, slots, self.debug) and
             HardConstraints.enforce_respect_part_assign(slots, self.part_assign, self.debug) and
             HardConstraints.enforce_respect_unwanted(slots, self.unwanted, self.debug) and
             HardConstraints.enforce_city_hard_constraints(slots, games, practices, self.debug))
+        # print(val)
+        return val
     
     def __repr__(self):
         return (f"HardConstraints(NotCompatible={self.not_compatible}, "
                 f"PartAssign={self.part_assign}, Unwanted={self.unwanted}, "
                 f"Debug={self.debug})")
 
-    def enforce_game_max(slots: List[Slot], debug: bool):
+    def enforce_game_max(slots: List[Slot], debug = False):
         if (debug):
             print("enforce_game_max:")
         for slot in slots:
@@ -38,7 +40,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_practice_max(slots: List[Slot], debug: bool):
+    def enforce_practice_max(slots: List[Slot], debug = False):
         if (debug):
             print("enforce_practice_max:")
         for slot in slots:
@@ -52,7 +54,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_no_simultaneous_assignment(games: List[Game], practices: List[Practice], debug: bool):
+    def enforce_no_simultaneous_assignment(games: List[Game], practices: List[Practice], debug = False):
         if (debug):
             print("enforce_no_simultaneous_assignment:")
         for game in games:
@@ -69,7 +71,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_respect_not_compatible(not_compatible, slots: List[Slot], debug: bool):
+    def enforce_respect_not_compatible(not_compatible, slots: List[Slot], debug = False):
         if (debug):
             print("enforce_respect_not_compatible:")
         for slot in slots:
@@ -87,7 +89,7 @@ class HardConstraints:
             print("  True")
         return True
 
-    def enforce_respect_part_assign(slots: List[Slot], part_assign: List[Tuple[Slot, str]], debug: bool):
+    def enforce_respect_part_assign(slots: List[Slot], part_assign: List[Tuple[Slot, str]], debug = False):
         if (debug):
             print("enforce_respect_part_assign:")
         for assign in part_assign:
@@ -105,7 +107,7 @@ class HardConstraints:
             print("  True")
         return True
 
-    def enforce_respect_unwanted(slots: List[Slot], unwanted: List[Tuple[str, Slot]], debug: bool):
+    def enforce_respect_unwanted(slots: List[Slot], unwanted: List[Tuple[str, Slot]], debug = False):
         if (debug):
             print("enforce_respect_unwanted:")
         for avoid in unwanted:
@@ -123,7 +125,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_city_hard_constraints(slots: List[Slot], games: List[Game], practices: List[Practice], debug: bool):
+    def enforce_city_hard_constraints(slots: List[Slot], games: List[Game], practices: List[Practice], debug = False):
         if (debug):
             print("")
         return (HardConstraints.enforce_city_abstract_slots(slots, debug) and
@@ -150,7 +152,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_city_evening_division_assignment(games: List[Game], practices: List[Practice], debug: bool):
+    def enforce_city_evening_division_assignment(games: List[Game], practices: List[Practice], debug = False):
         if (debug):
             print("enforce_evening_division_assignment")
         for game in games:
@@ -189,7 +191,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_city_avoid_overlap(games: List[Game], debug: bool):
+    def enforce_city_avoid_overlap(games: List[Game], debug = False):
         if (debug):
             print("enforce_city_avoid_overlap")
         for game in games:
@@ -212,7 +214,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_city_admin_meeting(games: List[Game], debug: bool):
+    def enforce_city_admin_meeting(games: List[Game], debug = False):
         if (debug):
             print("enforce_city_admin_meeting")
         for game in games:
@@ -226,7 +228,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_city_tryout_bookings(games: List[Game], practices: List[Practice], debug: bool):
+    def enforce_city_tryout_bookings(games: List[Game], practices: List[Practice], debug = False):
         if (debug):
             print("enforce_city_tryout_bookings")
         u12_id = ""

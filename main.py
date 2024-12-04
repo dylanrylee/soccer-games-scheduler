@@ -194,8 +194,10 @@ if __name__ == "__main__":
     # print("\n\n")
     # print(soft_constraints)
     
-    # root_node = AndTreeNode(main.slots, main.games, main.practices, 0)
-    # search_process = SearchProcess(root_node, hard_constraints, soft_constraints)
+    root_node = AndTreeNode(main.slots, main.games, main.practices, 0)
+    search_process = SearchProcess(root_node, hard_constraints, soft_constraints)
+
+    print(search_process)
 
     # Assign games and practices to slots
     # main.assign_games_to_slots()

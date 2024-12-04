@@ -1,5 +1,6 @@
 from typing import List, Tuple
 from scheduler_structures import *
+from AndTreeNode import *
 
 class SoftConstraints:
     def __init__(self, pen_game_min: int, pen_practice_min: int, w_min_filled: int,
@@ -17,11 +18,11 @@ class SoftConstraints:
         self.pen_section = pen_section
         self.w_sec_diff = w_sec_diff
 
-    def eval(self, games: List[Game], practices: List[Practice], slots: List[Slot]):
-        return (SoftConstraints.consider_minimum_assignment(slots, self.pen_game_min, self.pen_practice_min) * self.w_min_filled +
-                SoftConstraints.consider_slot_preference(slots, self.slot_pref) * self.w_pref +
-                SoftConstraints.consider_pair_preference(slots, self.pair_pref, self.pen_not_paired) * self.w_pair +
-                SoftConstraints.consider_city_soft_constraints(games, self.pen_section) * self.w_sec_diff)
+    def eval(self, node: AndTreeNode):
+        return (SoftConstraints.consider_minimum_assignment(node.slots, self.pen_game_min, self.pen_practice_min) * self.w_min_filled +
+                SoftConstraints.consider_slot_preference(node.slots, self.slot_pref) * self.w_pref +
+                SoftConstraints.consider_pair_preference(node.slots, self.pair_pref, self.pen_not_paired) * self.w_pair +
+                SoftConstraints.consider_city_soft_constraints(node.games, self.pen_section) * self.w_sec_diff)
     
     def __repr__(self):
         return (f"SoftConstraints(PenGameMin={self.pen_game_min}, "

@@ -4,15 +4,25 @@ class Slot:
     """
     Represents a time slot (s ∈ S).
     """
-    def __init__(self, day: str, start_time: str, max_games: int, min_games: int, max_practices: int, min_practices: int):
+    # def __init__(self, day: str, start_time: str, max_games: int, min_games: int, max_practices: int, min_practices: int):
+    #     self.day = day                              
+    #     self.start_time = start_time                # Start time in "HH:MM" format
+    #     self.max_games = max_games
+    #     self.min_games = min_games
+    #     self.max_practices = max_practices
+    #     self.min_practices = min_practices
+    #     self.assigned_games: List[str] = []
+    #     self.assigned_practices: List[str] = []
+
+    def __init__(self, day: str, start_time: str, max_games: int, min_games: int, max_practices: int, min_practices: int, assigned_games: List[str] = [], assigned_practices: List[str] = []):
         self.day = day                              
         self.start_time = start_time                # Start time in "HH:MM" format
         self.max_games = max_games
         self.min_games = min_games
         self.max_practices = max_practices
         self.min_practices = min_practices
-        self.assigned_games: List[str] = []
-        self.assigned_practices: List[str] = []
+        self.assigned_games: List[str] = assigned_games
+        self.assigned_practices: List[str] = assigned_practices
 
     def get_assigned_games(self):
         return self.assigned_games
@@ -30,14 +40,14 @@ class Game:
     """
     Represents a game (g ∈ G).
     """
-    def __init__(self, identifier: str, league: str, age_group: str, tier: str, division: str):
+    def __init__(self, identifier: str, league: str, age_group: str, tier: str, division: str, assigned_slot: Optional[Slot] = None, constraints: List[Union[str, Slot]] = []):
         self.identifier = identifier    # Unique game identifier
         self.league = league            
         self.age_group = age_group      
         self.tier = tier      
         self.division = division
-        self.assigned_slot: Optional[Slot] = None
-        self.constraints: List[Union[str, Slot]] = []
+        self.assigned_slot = assigned_slot
+        self.constraints = constraints
 
     def assign_slot(self, slot: Slot):
         """
@@ -54,12 +64,12 @@ class Practice:
     """
     Represents a practice (p ∈ P).
     """
-    def __init__(self, identifier: str, associated_game: Optional[str], type_: str):
+    def __init__(self, identifier: str, associated_game: Optional[str], type: str, assigned_slot: Optional[Slot] = None, constraints: List[Union[str, Slot]] = []):
         self.identifier = identifier                # Unique practice identifier
         self.associated_game = associated_game      # Game ID that this practice is linked to
-        self.type = type_
-        self.assigned_slot: Optional[Slot] = None
-        self.constraints: List[Union[str, Slot]] = []
+        self.type = type
+        self.assigned_slot = assigned_slot
+        self.constraints = constraints
 
     def assign_slot(self, slot: Slot):
         """
