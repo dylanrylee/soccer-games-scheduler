@@ -1,6 +1,7 @@
 from typing import List, Tuple
 from scheduler_structures import *
 from hard_constraints import *
+import copy
 
 class AndTreeNode:
     """
@@ -27,39 +28,92 @@ class AndTreeNode:
                 for slot in self.slots:
                     # print(f"    slot: {slot.day}")
                     # Create a new list of slots where the current slot is copied to ensure immutability
-                    new_slots = [s if s != slot else Slot(**slot.__dict__) for s in self.slots]
+                    # new_slots = [s if s != slot else Slot(**slot.__dict__) for s in self.slots]
+                    new_slots = copy.deepcopy(self.slots)
                     # for item in new_slots:
                     #     print(f"    new_slot: {item.day}")
 
+                    # print("  Slots")
+                    # print(self.slots)
+                    # print("")
+                    # print(new_slots)
+
                     # Create a new game object by copying the current game's attributes
-                    new_game = Game(**game.__dict__)
+                    # new_game = Game(**game.__dict__)
+
+                    new_games = copy.deepcopy(self.games)
+                    # new_games = [g if g != game else Game(**game.__dict__) for g in self.games]
+
+                    # print("  Before")
+                    # print(f"    {self.games}")
+                    # print(f"    {new_games}")
+                    # print("")
 
                     # Assign the current slot to the new game
                     # self.assign_game(new_game, slot)
-                    new_game.assign_slot(slot)
+                    # new_game.assign_slot(slot)
+                    for new_slot in new_slots:
+                        if new_slot.day == slot.day and new_slot.start_time == slot.start_time:
+                            cont = True
+                            for new_game in new_games:
+                                if new_game.identifier == game.identifier:
+                                    new_game.assign_slot(new_slot)
+                                    # new_slot.assigned_games.append(new_game)
+                                    cont = False
+                                    break
+                            if cont == False:
+                                break
+
+                    # print("  After")
+                    # print(f"    {self.games}")
+                    # print(f"    {new_games}")
+                    # print("")
 
                     # Create a new child node with the updated slots, games, practices, and increment the depth by 1
-                    new_node = AndTreeNode(new_slots, self.games, self.practices, self.depth + 1)
+                    # new_node = AndTreeNode(new_slots, self.games, self.practices, self.depth + 1)
+                    new_node = AndTreeNode(new_slots, new_games, self.practices, self.depth + 1)
+                    print("  New Node")
+                    print(f"    {new_node}")
+                    print("")
+                    print("")
+                    print("")
 
-                    constraints.debug = True
+                    # constraints.debug = True
+                    # print(new_node)
                     if constraints.constr(new_node.games, new_node.practices, new_node.slots):  # Stop if constraints are satisfied
                         # print("      True")
                         # Append the new child node to the list of children
                         self.children.append(new_node)
+                        # break
                     # else:
                         # print("      False")
         
         for practice in self.practices:
             if practice.assigned_slot is None:
                 for slot in self.slots:
-                    new_slots = [s if s != slot else Slot(**slot.__dict__) for s in self.slots]
-                    new_practice = Practice(**practice.__dict__)
-                    new_practice.assign_slot(slot)
+                    # new_slots = [s if s != slot else Slot(**slot.__dict__) for s in self.slots]
+                    new_slots = copy.deepcopy(self.slots)
+                    # new_practice = Practice(**practice.__dict__)
+                    new_practices = copy.deepcopy(self.practices)
+                    # new_practice.assign_slot(slot)
+                    for new_slot in new_slots:
+                        if new_slot.day == slot.day and new_slot.start_time == slot.start_time:
+                            cont = True
+                            for new_practice in new_practices:
+                                if new_practice.identifier == practice.identifier:
+                                    new_practice.assign_slot(new_slot)
+                                    # new_slot.assigned_games.append(new_game)
+                                    cont = False
+                                    break
+                            if cont == False:
+                                break
                     # self.assign_practice(new_practice, slot)
-                    new_node = AndTreeNode(new_slots, self.games, self.practices, self.depth + 1)
+                    # new_node = AndTreeNode(new_slots, self.games, self.practices, self.depth + 1)
+                    new_node = AndTreeNode(new_slots, self.games, new_practices, self.depth + 1)
 
                     if constraints.constr(new_node.games, new_node.practices, new_node.slots):  # Stop if constraints are satisfied
                         self.children.append(new_node)
+                        # break
 
         """
         Assigns a game to a slot if constraints are met.
@@ -112,4 +166,4 @@ class AndTreeNode:
         return False
     
     def __repr__(self):
-        return f"AndTreeNode(Depth={self.depth}, Slots={self.slots}, Games={self.games}, Practices={self.practices})"
+        return f"AndTreeNode(Depth={self.depth},\n  Slots={self.slots},\n  Games={self.games},\n  Practices={self.practices},\n  Children={self.children})"

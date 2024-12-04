@@ -1,0 +1,38 @@
+Name:
+city1
+
+Game slots:
+MO, 8:00, 2, 1
+MO, 9:00, 5, 0
+TU, 8:00, 2, 1
+TU, 9:30, 5, 0
+
+Practice slots:
+MO, 8:00, 2, 1
+MO, 9:00, 6, 3
+TU, 8:00, 2, 1
+TU, 9:00, 6, 3
+
+Games:
+CSSC O19T1 DIV 01
+CSSC O19T1 DIV 02
+CMSA U12T1 DIV 01
+CMSA U11T1 DIV 01
+
+Practices:
+CSSC O19T1 DIV 01 PRC 01
+CSSC O19T1 DIV 01 PRC 02
+
+Not compatible:
+CMSA U12T1 DIV 01, CMSA U11T1 DIV 01
+
+Unwanted:
+CSSC O19T1 DIV 01, MO, 8:00
+
+Preferences:
+MO, 8:00, CSSC O19T1 DIV 02, 100
+
+Pair:
+CMSA U12T1 DIV 01, CMSA U11T1 DIV 01
+
+Partial assignments:
