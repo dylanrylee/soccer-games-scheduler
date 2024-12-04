@@ -52,15 +52,25 @@ class AndTreeNode:
                     # Assign the current slot to the new game
                     # self.assign_game(new_game, slot)
                     # new_game.assign_slot(slot)
+                    assigned = False
                     for new_slot in new_slots:
-                        if new_slot.day == slot.day and new_slot.start_time == slot.start_time:
+                        # print(f"New {new_slot}")
+                        # print(f"Original {slot}")
+                        if new_slot.day == slot.day and new_slot.start_time == slot.start_time and assigned == False:
                             cont = True
+                            
                             for new_game in new_games:
+                                print(f"Game {game.identifier}")
+                                print(f"New Identifier {new_game.identifier}")
                                 if new_game.identifier == game.identifier:
                                     new_game.assign_slot(new_slot)
+                                    print(f"Inner {new_slot}")
+
                                     # new_slot.assigned_games.append(new_game)
+                                    assigned = True
                                     cont = False
                                     break
+                            print(cont)
                             if cont == False:
                                 break
 
@@ -68,18 +78,13 @@ class AndTreeNode:
                     # print(f"    {self.games}")
                     # print(f"    {new_games}")
                     # print("")
-
+                    print(f"Outside {new_slots}")
                     # Create a new child node with the updated slots, games, practices, and increment the depth by 1
-                    # new_node = AndTreeNode(new_slots, self.games, self.practices, self.depth + 1)
-                    new_node = AndTreeNode(new_slots, new_games, self.practices, self.depth + 1)
-                    print("  New Node")
-                    print(f"    {new_node}")
-                    print("")
-                    print("")
-                    print("")
+                    new_node = AndTreeNode(new_slots, self.games, self.practices, self.depth + 1)
+                    # new_node = AndTreeNode(new_slots, new_games, self.practices, self.depth + 1)
 
                     # constraints.debug = True
-                    # print(new_node)
+                    print(new_node)
                     if constraints.constr(new_node.games, new_node.practices, new_node.slots):  # Stop if constraints are satisfied
                         # print("      True")
                         # Append the new child node to the list of children
@@ -93,7 +98,6 @@ class AndTreeNode:
                 for slot in self.slots:
                     # new_slots = [s if s != slot else Slot(**slot.__dict__) for s in self.slots]
                     new_slots = copy.deepcopy(self.slots)
-                    # new_practice = Practice(**practice.__dict__)
                     new_practices = copy.deepcopy(self.practices)
                     # new_practice.assign_slot(slot)
                     for new_slot in new_slots:
