@@ -52,46 +52,46 @@ class AndTreeNode:
                     # Assign the current slot to the new game
                     # self.assign_game(new_game, slot)
                     # new_game.assign_slot(slot)
-                    assigned = False
+                    # assigned = False
                     for new_slot in new_slots:
                         # print(f"New {new_slot}")
                         # print(f"Original {slot}")
-                        if new_slot.day == slot.day and new_slot.start_time == slot.start_time and assigned == False:
-                            cont = True
+                        if new_slot.day == slot.day and new_slot.start_time == slot.start_time:
+                            # cont = True
                             
                             for new_game in new_games:
-                                print(f"Game {game.identifier}")
-                                print(f"New Identifier {new_game.identifier}")
+                                # print(f"Game {game.identifier}")
+                                # print(f"New Identifier {new_game.identifier}")
                                 if new_game.identifier == game.identifier:
                                     new_game.assign_slot(new_slot)
-                                    print(f"Inner {new_slot}")
+                                    # print(f"Inner {new_slot}")
 
                                     # new_slot.assigned_games.append(new_game)
-                                    assigned = True
-                                    cont = False
+                                    # assigned = True
+                                    # cont = False
                                     break
-                            print(cont)
-                            if cont == False:
-                                break
+                            # print(cont)
+                    # if cont == False:
+                    #     break
 
                     # print("  After")
                     # print(f"    {self.games}")
                     # print(f"    {new_games}")
                     # print("")
-                    print(f"Outside {new_slots}")
+                    # print(f"Outside {new_slots}")
                     # Create a new child node with the updated slots, games, practices, and increment the depth by 1
                     new_node = AndTreeNode(new_slots, self.games, self.practices, self.depth + 1)
                     # new_node = AndTreeNode(new_slots, new_games, self.practices, self.depth + 1)
 
                     # constraints.debug = True
-                    print(new_node)
+                    # print(new_node)
                     if constraints.constr(new_node.games, new_node.practices, new_node.slots):  # Stop if constraints are satisfied
                         # print("      True")
                         # Append the new child node to the list of children
                         self.children.append(new_node)
                         # break
                     # else:
-                        # print("      False")
+                    # print("      False")
         
         for practice in self.practices:
             if practice.assigned_slot is None:
@@ -123,34 +123,34 @@ class AndTreeNode:
         Assigns a game to a slot if constraints are met.
         Returns True if assignment is successful, False otherwise.
         """
-    def assign_game(self, game: Game, slot: Slot) -> bool:
-        if HardConstraints.enforce_game_max(self.slots):
-            # self.slots[slot]["games"].append(game.identifier)
-            game.assign_slot(slot)
-            return True
-        return False
+    # def assign_game(self, game: Game, slot: Slot) -> bool:
+    #     if HardConstraints.enforce_game_max(self.slots):
+    #         # self.slots[slot]["games"].append(game.identifier)
+    #         game.assign_slot(slot)
+    #         return True
+    #     return False
 
-    def assign_practice(self, practice: Practice, slot: Slot) -> bool:
-        """
-        Assigns a practice to a slot if constraints are met.
-        Returns True if assignment is successful, False otherwise.
-        """
-        if len(self.slots) < slot.max_practices:
-            # self.slots[slot].append(practice.identifier)
-            practice.assign_slot(slot)
-            return True
-        return False
+    # def assign_practice(self, practice: Practice, slot: Slot) -> bool:
+    #     """
+    #     Assigns a practice to a slot if constraints are met.
+    #     Returns True if assignment is successful, False otherwise.
+    #     """
+    #     if len(self.slots) < slot.max_practices:
+    #         # self.slots[slot].append(practice.identifier)
+    #         practice.assign_slot(slot)
+    #         return True
+    #     return False
 
-    def is_valid(self) -> bool:
-        """
-        Validates the state to ensure all slots respect their constraints.
-        """
-        for slot, assignments in self.slots.items():
-            if len(assignments["games"]) > slot.max_games:
-                return False  
-            if len(assignments["practices"]) > slot.max_practices:
-                return False
-        return True
+    # def is_valid(self) -> bool:
+    #     """
+    #     Validates the state to ensure all slots respect their constraints.
+    #     """
+    #     for slot, assignments in self.slots.items():
+    #         if len(assignments["games"]) > slot.max_games:
+    #             return False  
+    #         if len(assignments["practices"]) > slot.max_practices:
+    #             return False
+    #     return True
 
     def is_complete_schedule(self) -> bool:
         """

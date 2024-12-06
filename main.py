@@ -93,14 +93,14 @@ if __name__ == "__main__":
 
     # Take in the command line arguments
     file_name = sys.argv[1]
-    w_min_filled = sys.argv[2]
-    w_pref = sys.argv[3]
-    w_pair = sys.argv[4]
-    w_sec_diff = sys.argv[5]
-    pen_game_min = sys.argv[6]
-    pen_practice_min = sys.argv[7]
-    pen_not_paired = sys.argv[8]
-    pen_section = sys.argv[9]
+    w_min_filled = int(sys.argv[2])
+    w_pref = int(sys.argv[3])
+    w_pair = int(sys.argv[4])
+    w_sec_diff = int(sys.argv[5])
+    pen_game_min = int(sys.argv[6])
+    pen_practice_min = int(sys.argv[7])
+    pen_not_paired = int(sys.argv[8])
+    pen_section = int(sys.argv[9])
 
     # Read the file content
     file_content = read_file(file_name)
@@ -197,7 +197,24 @@ if __name__ == "__main__":
     root_node = AndTreeNode(main.slots, main.games, main.practices, 0)
     search_process = SearchProcess(root_node, hard_constraints, soft_constraints)
 
-    print(search_process)
+    print(f"Eval-value: {soft_constraints.eval(search_process)}")
+    # print(f"Result: {search_process}")
+    games_and_practices = []
+    for slot in search_process.slots:
+        for game in slot.assigned_games:
+            games_and_practices.append((game, slot.day, slot.start_time))
+        for practice in slot.assigned_practices:
+            games_and_practices.append((practice, slot.day, slot.start_time))
+    # sorted_games = sorted(main.games, key=lambda x: x.identifier)
+    # games_and_practices = []
+    # for game in sorted_games:
+    #     games_and_practices.append(game)
+    #     for practice in main.practices:
+    #         if practice.associated_game == game.identifier:
+    #             games_and_practices.append(practice)
+    for elem in sorted(games_and_practices, key=lambda x: x[0]):
+        print(elem[0] + ' ' * ( 30 - len(elem[0])) + ': ' + elem[1] + ', ' + elem[2])
+    
 
     # Assign games and practices to slots
     # main.assign_games_to_slots()

@@ -1,4 +1,5 @@
 from typing import List, Optional, Union
+import copy
 
 class Slot:
     """
@@ -21,8 +22,8 @@ class Slot:
         self.min_games = min_games
         self.max_practices = max_practices
         self.min_practices = min_practices
-        self.assigned_games: List[str] = assigned_games
-        self.assigned_practices: List[str] = assigned_practices
+        self.assigned_games: List[str] = copy.deepcopy(assigned_games)
+        self.assigned_practices: List[str] = copy.deepcopy(assigned_practices)
 
     def get_assigned_games(self):
         return self.assigned_games
@@ -54,7 +55,7 @@ class Game:
         Assigns the game to a specific slot.
         """          
         self.assigned_slot = slot
-        slot.assigned_games.insert(len(slot.assigned_games), self.identifier)
+        slot.assigned_games.append(self.identifier)
 
     def __repr__(self):
         return (f"Game(ID={self.identifier}, League={self.league}, AgeGroup={self.age_group}, "
@@ -76,7 +77,7 @@ class Practice:
         Assigns the practice to a specific slot.
         """
         self.assigned_slot = slot
-        slot.assigned_practices.insert(len(slot.assigned_practices), self.identifier)
+        slot.assigned_practices.append(self.identifier)
 
     def __repr__(self):
         return (f"Practice(ID={self.identifier}, AssociatedGame={self.associated_game}, "

@@ -64,7 +64,7 @@ class Fbound:
         L = self.root.children
 
         # This is the cutoff of the fbound
-        cutoff = math.ceil(len(L) * (1-self.threshold))
+        cutoff = math.ceil(len(L) * (1-self.threshold)) + 1
 
         # this sorts the leaves by their evaluation function value, in reverse order.
         # So Eval(l_1) >= ... >= Eval(l_n)
@@ -91,18 +91,21 @@ def SearchProcess(root_node: AndTreeNode, hard_constraints: HardConstraints, sof
     current_node.expand(hard_constraints)
     # print(current_node)
     for i in range(100):
-        print(i)
+        # print(i)
         # print(current_node)
         if (current_node == None or current_node.children == None):
-            print("  break")
+            # print("  break")
             break
         elif current_node.is_complete_schedule():
-            print(f"  {current_node}")
+            # print(f"  {current_node}")
             completed_schdules.append(current_node)
-            current_node = current_node.parent
-            current_node.children.remove[0]
+            # for child in current_node.children:
+            #     completed_schdules.append(SearchProcess(child, hard_constraints, soft_constraints))
+            break
+            # current_node = current_node.parent
+            # current_node.children.remove[0]
         else:
-            print(f"  expand")
+            # print(f"  expand")
             current_node.expand(hard_constraints)
             current_node.children = Fbound(current_node, threshold, soft_constraints).f_bound()
         # print(current_node)
