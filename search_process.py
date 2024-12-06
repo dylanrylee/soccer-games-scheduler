@@ -17,7 +17,7 @@ class Fleaf:
     """
     Decides which of the current_node children to expand and returns the best child
     """
-    def f_leaf(constraints: SoftConstraints, current_node: AndTreeNode):
+    def f_leaf(self, constraints: SoftConstraints, current_node: AndTreeNode):
 
         "Eval is what is used to find score based from the soft constraints"
         node_to_expand : AndTreeNode = None
@@ -33,22 +33,19 @@ class Ftrans:
     """
     
     """
-    def __init__(self, root: AndTreeNode):
-        self.root = root # This is the root of the set of leaves
+    def __init__(self, chosen_leaf: AndTreeNode):
+        self.chosen_leaf = chosen_leaf # This is the root of the set of leaves
 
-    def f_trans(self, current_node: AndTreeNode, hard_constraints: HardConstraints, soft_constraints: SoftConstraints) -> AndTreeNode:
+    def f_trans(self, current_node: AndTreeNode, soft_constraints: SoftConstraints) -> AndTreeNode:
         """
         This function makes the transition to the state that has the lowest eval score
         within the current nodes' leaves set
         """
-
-        chosen_leaf = Fleaf.f_leaf(soft_constraints, current_node)
-        # print(chosen_leaf)
             
         # If the child state of the current state has the same eval
-        if (chosen_leaf != None and soft_constraints.eval(chosen_leaf) <= soft_constraints.eval(current_node)):
+        if (self.chosen_leaf != None and soft_constraints.eval(self.chosen_leaf) <= soft_constraints.eval(current_node)):
             current_node.parent = current_node
-            return chosen_leaf
+            return self.chosen_leaf
         else:
             return None
 
@@ -78,42 +75,91 @@ class Fbound:
         return sorted_L
     
 
+# def SearchProcess(root_node: AndTreeNode, hard_constraints: HardConstraints, soft_constraints: SoftConstraints):
+
+#     # Create the initial state (root node)
+#     completed_schdules: List[AndTreeNode] = []
+#     # Initialize the classes
+#     threshold = 0.6  # Example threshold value
+#     fbound = Fbound(root_node, threshold, soft_constraints)
+#     ftrans = Ftrans(root_node)
+
+#     current_node = root_node
+#     current_node.expand(hard_constraints)
+#     # print(current_node)
+#     for _ in range(100):
+#         # print(i)
+#         # print(current_node)
+#         if (current_node == None or current_node.children == None):
+#             # print("  break")
+#             break
+#         elif current_node.is_complete_schedule():
+#             # print(f"  {current_node}")
+#             completed_schdules.append(current_node)
+#             break
+#         else:
+#             # print(f"  expand")
+#             current_node.expand(hard_constraints)
+#             current_node.children = Fbound(current_node, threshold, soft_constraints).f_bound()
+#         print(current_node)
+#         current_node = ftrans.f_trans(current_node, hard_constraints, soft_constraints)
+    
+#     best_schedule = None
+#     if len(completed_schdules) > 0:
+#         best_schedule = min(completed_schdules, key=soft_constraints.eval)
+    
+#     print(len(completed_schdules))
+#     print(current_node.children)
+
+#     return best_schedule    
+
 def SearchProcess(root_node: AndTreeNode, hard_constraints: HardConstraints, soft_constraints: SoftConstraints):
+        """
+        1. Expand the inputted node.
+        2. Call f_bound on the leaf children to filter them.
+        3. Use f_leaf to select the best leaf.
+        4. Transition with f_trans.
+        5. Repeat until complete schedules are collected.
+        6. Return the best schedule.
+        """
+        current_node = root_node
+        complete_schedules = []
 
-    # Create the initial state (root node)
-    completed_schdules: List[AndTreeNode] = []
-    # Initialize the classes
-    threshold = 0.6  # Example threshold value
-    fbound = Fbound(root_node, threshold, soft_constraints)
-    ftrans = Ftrans(root_node)
-
-    current_node = root_node
-    current_node.expand(hard_constraints)
-    # print(current_node)
-    for i in range(100):
-        # print(i)
-        # print(current_node)
-        if (current_node == None or current_node.children == None):
-            # print("  break")
-            break
-        elif current_node.is_complete_schedule():
-            # print(f"  {current_node}")
-            completed_schdules.append(current_node)
-            # for child in current_node.children:
-            #     completed_schdules.append(SearchProcess(child, hard_constraints, soft_constraints))
-            break
-            # current_node = current_node.parent
-            # current_node.children.remove[0]
-        else:
-            # print(f"  expand")
+        while True:
+            # Step 1: Expand the current node
             current_node.expand(hard_constraints)
-            current_node.children = Fbound(current_node, threshold, soft_constraints).f_bound()
-        # print(current_node)
-        current_node = ftrans.f_trans(current_node, hard_constraints, soft_constraints)
-    
-    best_schedule = None
-    if len(completed_schdules) > 0:
-        best_schedule = min(completed_schdules, key=soft_constraints.eval)
-    
-    return best_schedule
+
+            # Step 2: Filter leaves using f_bound
+            fbound = Fbound(current_node, threshold=0.4, constraints=soft_constraints)
+            filtered_leaves = fbound.f_bound()
+
+            if not filtered_leaves:
+                break  # No more nodes to process
+
+            # Step 3: Select the best leaf with f_leaf
+            fleaf = Fleaf(root_node, hard_constraints, soft_constraints)
+            chosen_leaf = fleaf.f_leaf(soft_constraints, current_node)
+
+            # Step 4: Transition to the chosen leaf with f_trans
+            ftrans = Ftrans(chosen_leaf)
+            transitioned_leaf = ftrans.f_trans(current_node, soft_constraints)
+
+            if transitioned_leaf == None:
+                break  # Can't transition further
+
+            # Step 5: Check if the schedule is complete
+            if transitioned_leaf.is_complete_schedule():
+                complete_schedules.append(transitioned_leaf)
+
+            # Set the transitioned leaf as the current node for the next iteration
+            current_node = transitioned_leaf
+
+            print(current_node.depth)
+        print(len(complete_schedules))
         
+        # Step 6: Get the best schedule from all complete schedules
+        if complete_schedules:
+            best_schedule = min(complete_schedules, key=soft_constraints.eval)
+            return best_schedule
+        else:
+            return None
