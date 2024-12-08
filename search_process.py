@@ -43,6 +43,10 @@ class Ftrans:
         """
 
         chosen_leaf = Fleaf.f_leaf(soft_constraints, current_node)
+<<<<<<< Updated upstream
+=======
+        # print(chosen_leaf)
+>>>>>>> Stashed changes
             
         # If the child state of the current state has the same eval
         if (chosen_leaf != None and soft_constraints.eval(chosen_leaf) <= soft_constraints.eval(current_node)):
@@ -88,6 +92,7 @@ def SearchProcess(root_node: AndTreeNode, hard_constraints: HardConstraints, sof
 
     current_node = root_node
     current_node.expand(hard_constraints)
+<<<<<<< Updated upstream
     for i in range(100):
         print(i)
         if (current_node == None or current_node.children == None):
@@ -102,6 +107,28 @@ def SearchProcess(root_node: AndTreeNode, hard_constraints: HardConstraints, sof
             print(f"  expand")
             current_node.expand(hard_constraints)
             current_node.children = Fbound(current_node, threshold, soft_constraints).f_bound()
+=======
+    # print(current_node)
+    for i in range(100):
+        # print(i)
+        # print(current_node)
+        if (current_node == None or current_node.children == None):
+            # print("  break")
+            break
+        elif current_node.is_complete_schedule():
+            # print(f"  {current_node}")
+            completed_schdules.append(current_node)
+            # for child in current_node.children:
+            #     completed_schdules.append(SearchProcess(child, hard_constraints, soft_constraints))
+            break
+            # current_node = current_node.parent
+            # current_node.children.remove[0]
+        else:
+            # print(f"  expand")
+            current_node.expand(hard_constraints)
+            current_node.children = Fbound(current_node, threshold, soft_constraints).f_bound()
+        # print(current_node)
+>>>>>>> Stashed changes
         current_node = ftrans.f_trans(current_node, hard_constraints, soft_constraints)
     
     best_schedule = None
