@@ -30,7 +30,9 @@ class AndTreeNode:
         :param expansion_logic: A callable that takes (slots, games, practices) and returns a list of child states.
         :param hard_constraints: An instance of the HardConstraints class to validate potential child nodes.
         """
+        # Check if their are any more games or practices to be added to slots
         if self.games or self.practices:
+            # call to expansion logic to create child states
             child_states = expansion_logic(self.slots, self.games, self.practices)
             for child_slots, child_games, child_practices in child_states:
                 # Check hard constraints before adding a child node
@@ -73,7 +75,7 @@ class AndTreeNode:
         print(f"  Remaining Practices: {self.get_remaining_practices()}")
         print(f"  Children Count: {len(self.children)}")
         print("-" * 40)
-        
+
 def constrained_expansion_logic(slots: List[Slot], games: List[Game], practices: List[Practice]):
     """
     Expansion logic: Assign the first unassigned game or practice to an available slot.
