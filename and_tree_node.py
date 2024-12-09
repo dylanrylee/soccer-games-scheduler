@@ -73,7 +73,7 @@ class AndTreeNode:
         print(f"  Remaining Practices: {self.get_remaining_practices()}")
         print(f"  Children Count: {len(self.children)}")
         print("-" * 40)
-
+        
 def constrained_expansion_logic(slots: List[Slot], games: List[Game], practices: List[Practice]):
     """
     Expansion logic: Assign the first unassigned game or practice to an available slot.
@@ -82,34 +82,32 @@ def constrained_expansion_logic(slots: List[Slot], games: List[Game], practices:
     - For MO slots, create WE slots with the same time for the same practice.
     """
     new_states = []
+    
+    def assign_to_slot(item_list, item_type):
+        item_to_assign = item_list[0]  # Get the first unassigned item
+        remaining_items = item_list[1:]  # Remaining unassigned items
+        for slot_index, slot in enumerate(slots):
+            # Check slot capacity for the item type
+            if (item_type == "game" and len(slot.assigned_games) < slot.max_games) or \
+               (item_type == "practice" and len(slot.assigned_practices) < slot.max_practices):
+                
+                # Create new states with minimal deep copies
+                new_slots = copy.deepcopy(slots)
+                new_item_list = copy.deepcopy(remaining_items)
+                
+                # Assign the item to the slot
+                if item_type == "game":
+                    new_slots[slot_index].assigned_games.append(item_to_assign.identifier)
+                elif item_type == "practice":
+                    new_slots[slot_index].assigned_practices.append(item_to_assign.identifier)
+                
+                # Add new state
+                new_states.append((new_slots, games if item_type == "practice" else new_item_list, 
+                                   practices if item_type == "game" else new_item_list))
+    
     if games:
-        # Assign the first unassigned game to all possible slots
-        game_to_assign = games[0]
-        for slot in slots:
-            if len(slot.assigned_games) < slot.max_games:  # Slot has capacity
-                new_slots = copy.deepcopy(slots)
-                new_games = copy.deepcopy(games[1:])  # Remove assigned game
-                new_practices = copy.deepcopy(practices)
-
-                # Assign the game
-                new_slots[slots.index(slot)].assigned_games.append(game_to_assign.identifier)
-
-                # Add new state
-                new_states.append((new_slots, new_games, new_practices))
-
+        assign_to_slot(games, "game")
     elif practices:
-        # Assign the first unassigned practice to all possible slots
-        practice_to_assign = practices[0]
-        for slot in slots:
-            if len(slot.assigned_practices) < slot.max_practices:  # Slot has capacity
-                new_slots = copy.deepcopy(slots)
-                new_games = copy.deepcopy(games)
-                new_practices = copy.deepcopy(practices[1:])  # Remove assigned practice
-
-                # Assign the practice
-                new_slots[slots.index(slot)].assigned_practices.append(practice_to_assign.identifier)
-
-                # Add new state
-                new_states.append((new_slots, new_games, new_practices))
+        assign_to_slot(practices, "practice")
     
     return new_states
