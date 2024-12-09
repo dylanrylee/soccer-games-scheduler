@@ -19,10 +19,11 @@ class SoftConstraints:
         self.w_sec_diff = w_sec_diff
 
     def eval(self, node: AndTreeNode):
-        return (SoftConstraints.consider_minimum_assignment(node.slots, self.pen_game_min, self.pen_practice_min) * self.w_min_filled +
+        val = (SoftConstraints.consider_minimum_assignment(node.slots, self.pen_game_min, self.pen_practice_min) * self.w_min_filled +
                 SoftConstraints.consider_slot_preference(node.slots, self.slot_pref) * self.w_pref +
                 SoftConstraints.consider_pair_preference(node.slots, self.pair_pref, self.pen_not_paired) * self.w_pair +
-                SoftConstraints.consider_city_soft_constraints(node.games, self.pen_section) * self.w_sec_diff)
+                SoftConstraints.consider_city_soft_constraints(node.slots, self.pen_section) * self.w_sec_diff)
+        return val
     
     def __repr__(self):
         return (f"SoftConstraints(PenGameMin={self.pen_game_min}, "
@@ -60,21 +61,15 @@ class SoftConstraints:
                 penalty += pen_not_paired
         return penalty
 
-    def consider_city_soft_constraints(games: List[Game], pen_section: int):
-        return SoftConstraints.consider_city_separate_divisions(games, pen_section)
+    def consider_city_soft_constraints(slots: List[Slot], pen_section: int):
+        return SoftConstraints.consider_city_separate_divisions(slots, pen_section)
 
-    def consider_city_separate_divisions(games: List[Game], pen_section: int):
+    def consider_city_separate_divisions(slots: List[Slot], pen_section: int):
         penalty = 0
-        for game in games:
-            if game.assigned_slot != None:
-                for other_game in games:
-                    if (other_game.assigned_slot == None or
-                        game.identifier == other_game.identifier or
-                        game.age_group != other_game.age_group or
-                        game.tier != other_game.tier):
-                        continue
-                    if (game.assigned_slot.day == other_game.assigned_slot.day and
-                        game.assigned_slot.start_time == other_game.assigned_slot.start_time and
-                        game.division != other_game.division):
-                        penalty += pen_section
+        for slot in slots:
+            for game in slot.assigned_games:
+                for other_game in slot.assigned_games:
+                    if game != other_game:
+                        if game[:10] == other_game[:10]:
+                            penalty += pen_section
         return penalty

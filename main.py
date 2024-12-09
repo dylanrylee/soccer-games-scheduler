@@ -67,7 +67,12 @@ def parse_input(file_path: str) -> Tuple[List[Slot], List[Game], List[Practice],
             day, time, max_practices, min_practices = line.split(", ")
             slots.append(Slot(day, time, 0, 0, int(max_practices), int(min_practices)))
         elif section == "games":
-            games.append(Game(line, "", "", "", ""))
+            split = line.split()
+            league = split[0]
+            age = split[1][:3]
+            tier = split[1][3:]
+            division = f"{split[2]} {split[3]}"
+            games.append(Game(line, league, age, tier, division))
         elif section == "practices":
             # Parse practice ID
             match = re.match(r"^(.*) (PRC|OPN) \d+$", line)

@@ -34,7 +34,7 @@ class AndTreeNode:
             child_states = expansion_logic(self.slots, self.games, self.practices)
             for child_slots, child_games, child_practices in child_states:
                 # Check hard constraints before adding a child node
-                if hard_constraints.constr(child_games, child_practices, child_slots) == True:
+                if hard_constraints.constr(child_slots) == True:
                     child_node = AndTreeNode(
                         slots=child_slots,
                         games=child_games,
