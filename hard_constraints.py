@@ -215,8 +215,9 @@ class HardConstraints:
                     continue
                 for other_game in slot.assigned_games:
                     if (game != other_game and 
-                        (("U15" in game and "U15" in other_game) or ("U16" in game and "U16" in other_game) or
-                         ("U17" in game and "U17" in other_game) or ("U19" in game and "U19" in other_game))):
+                        ("U15" in other_game or "U16" in other_game or "U17" in other_game or "U19" in other_game)):
+                        # (("U15" in game and "U15" in other_game) or ("U16" in game and "U16" in other_game) or
+                        #  ("U17" in game and "U17" in other_game) or ("U19" in game and "U19" in other_game))):
                         return False
         if (debug):
             print("  True")

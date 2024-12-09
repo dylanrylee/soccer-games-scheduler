@@ -111,11 +111,11 @@ def parse_input(file_path: str) -> Tuple[List[Slot], List[Game], List[Practice],
             split = line.split(", ")[:2]
             first = split[0]
             second = split[1]
-            pair.append(first)
-            pair.append(second)
+            pair.append((first, second))
+            # pair.append(second)
         elif section == "preferences":
-            split = line.rsplit(", ", 2)[:3]
-            preferences = [split[0], split[1], split[2]]
+            split = line.rsplit(", ")[:4]
+            preferences = [split[0], split[1], split[2], split[3]]
 
     constraints = {
         "not_compatible": not_compatible,
@@ -125,6 +125,25 @@ def parse_input(file_path: str) -> Tuple[List[Slot], List[Game], List[Practice],
         "part_assign": part_assign
     }
     return slots, games, practices, constraints
+
+# def IterateTree(node: AndTreeNode, soft_constraints: SoftConstraints, hard_constraints: HardConstraints):
+#     completed_schedules = []
+
+#     node.expand(constrained_expansion_logic, hard_constraints)
+
+#     retain_count = math.ceil(0.6 * len(node.children))
+#     for child in sorted(node.children, key=soft_constraints.eval, reverse=True)[:retain_count]:
+#         if len(child.get_remaining_games() == 0) and len(child.get_remaining_practices() == 0):
+#             completed_schedules.append(child)
+#         else:
+#             for schedule in IterateTree(child, soft_constraints, hard_constraints):
+#                 completed_schedules.append(schedule)
+
+#     return completed_schedules
+
+    
+        # return sorted(children_nodes, key=self.soft_constraints.eval, reverse=True)[:retain_count]
+        
 
 
 # Example Usage
@@ -203,8 +222,8 @@ if __name__ == "__main__":
         ftrans = Ftrans(soft_constraints)
         transition_to_leaf = ftrans.transition_to_leaf(current_node, choose_lowest_eval_leaf)
 
-        if (transition_to_leaf == choose_lowest_eval_leaf):
-            completed_schedules.append(transition_to_leaf)
+        # if (transition_to_leaf == choose_lowest_eval_leaf):
+        #     completed_schedules.append(transition_to_leaf)
 
         if (len(transition_to_leaf.get_remaining_games()) == 0
             and len(transition_to_leaf.get_remaining_practices()) == 0):
@@ -221,26 +240,30 @@ if __name__ == "__main__":
 
     # print("Completed Schedules: ", len(completed_schedules))
     
-    best_schedule = min(completed_schedules, key=soft_constraints.eval)
+    if completed_schedules:
+        best_schedule = min(completed_schedules, key=soft_constraints.eval)
+    
 
-    # Print games and practices schedule by iterating through slots
-    print("Eval:", soft_constraints.eval(best_schedule))
+        # Print games and practices schedule by iterating through slots
+        print("Eval:", soft_constraints.eval(best_schedule))
 
-    # Iterate over all slots in the best schedule
-    output_list: List[str] = []
-    for slot in best_schedule.slots:
-        # Check if there are any games assigned to the slot
-        if slot.assigned_games:
-            for game in slot.assigned_games:
-                # Print the game assigned to this slot
-                output_list.append(f"{game}             : {slot.day}, {slot.start_time}")
-                
-        if slot.assigned_practices:
-            for practice in slot.assigned_practices:
-                buffer = " " * (30 - len(practice))
-                output_list.append(f"{practice}{buffer}: {slot.day}, {slot.start_time}")
+        # Iterate over all slots in the best schedule
+        output_list: List[str] = []
+        for slot in best_schedule.slots:
+            # Check if there are any games assigned to the slot
+            if slot.assigned_games:
+                for game in slot.assigned_games:
+                    # Print the game assigned to this slot
+                    output_list.append(f"{game}             : {slot.day}, {slot.start_time}")
+                    
+            if slot.assigned_practices:
+                for practice in slot.assigned_practices:
+                    buffer = " " * (30 - len(practice))
+                    output_list.append(f"{practice}{buffer}: {slot.day}, {slot.start_time}")
 
-    grr = sorted(output_list)
+        grr = sorted(output_list)
 
-    for elem in grr:
-        print(elem) 
+        for elem in grr:
+            print(elem) 
+    else:
+        print("No valid solution!")
