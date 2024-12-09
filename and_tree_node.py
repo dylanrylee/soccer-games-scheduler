@@ -94,30 +94,6 @@ def constrained_expansion_logic(slots: List[Slot], games: List[Game], practices:
                 # Assign the game
                 new_slots[slots.index(slot)].assigned_games.append(game_to_assign.identifier)
 
-                # Handle MO slot: Create WE and FR slots
-                if slot.day == "MO":
-                    time = slot.start_time
-                    we_slot = Slot(day="WE", start_time=time, max_games=1, min_games=1,
-                                   max_practices=slot.max_practices, min_practices=slot.min_practices,
-                                   assigned_games=[game_to_assign.identifier])
-                    fr_slot = Slot(day="FR", start_time=time, max_games=1, min_games=1,
-                                   max_practices=slot.max_practices, min_practices=slot.min_practices,
-                                   assigned_games=[game_to_assign.identifier])
-
-                    # Ensure these slots are only used for the assigned game
-                    new_slots.append(we_slot)
-                    new_slots.append(fr_slot)
-
-                # Handle TU slot: Create TH slot
-                elif slot.day == "TU":
-                    time = slot.start_time
-                    th_slot = Slot(day="TH", start_time=time, max_games=1, min_games=1,
-                                   max_practices=slot.max_practices, min_practices=slot.min_practices,
-                                   assigned_games=[game_to_assign.identifier])
-
-                    # Ensure this slot is only used for the assigned game
-                    new_slots.append(th_slot)
-
                 # Add new state
                 new_states.append((new_slots, new_games, new_practices))
 
@@ -132,26 +108,6 @@ def constrained_expansion_logic(slots: List[Slot], games: List[Game], practices:
 
                 # Assign the practice
                 new_slots[slots.index(slot)].assigned_practices.append(practice_to_assign.identifier)
-
-                # Handle TU slot: Create TH slot
-                if slot.day == "TU":
-                    time = slot.start_time
-                    th_slot = Slot(day="TH", start_time=time, max_games=slot.max_games, min_games=slot.min_games,
-                                   max_practices=1, min_practices=1,
-                                   assigned_practices=[practice_to_assign.identifier])
-
-                    # Ensure this slot is only used for the assigned practice
-                    new_slots.append(th_slot)
-
-                # Handle MO slot: Create WE slot
-                elif slot.day == "MO":
-                    time = slot.start_time
-                    we_slot = Slot(day="WE", start_time=time, max_games=slot.max_games, min_games=slot.min_games,
-                                   max_practices=1, min_practices=1,
-                                   assigned_practices=[practice_to_assign.identifier])
-
-                    # Ensure this slot is only used for the assigned practice
-                    new_slots.append(we_slot)
 
                 # Add new state
                 new_states.append((new_slots, new_games, new_practices))

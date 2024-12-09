@@ -42,8 +42,8 @@ class Fbound:
         remaining_children = evaluated_children[num_to_remove:]
         # print(len(remaining_children))
 
-        for child in remaining_children:
-            print(self.soft_constraints.eval(child))
+        # for child in remaining_children:
+        #     print(self.soft_constraints.eval(child))
 
         # Extract the nodes from the tuples and return
         return remaining_children
@@ -90,8 +90,8 @@ class Ftrans:
         parent_eval = self.soft_constraints.eval(parent_node)
         leaf_eval = self.soft_constraints.eval(chosen_leaf)
 
-        print(parent_eval)
-        print(leaf_eval)
+        # print(parent_eval)
+        # print(leaf_eval)
         # Transition only if the leaf's evaluation is <= the parent's evaluation
         if leaf_eval <= parent_eval:
             return chosen_leaf

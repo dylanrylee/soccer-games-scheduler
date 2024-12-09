@@ -85,7 +85,7 @@ def parse_input(file_path: str) -> Tuple[List[Slot], List[Game], List[Practice],
             not_compatible.append((items[0], items[1]))
         elif section == "unwanted":
             parts = line.split(", ")[:3]
-            print(parts)
+            # print(parts)
             identifier = parts[0]
             day = parts[1]
             time = parts[2]
@@ -158,20 +158,20 @@ if __name__ == "__main__":
 
         current_node.expand(constrained_expansion_logic, hard_constraints)
 
-        print("Current Node:")
-        current_node.print_node()
-        print(current_node.practices)
+        # print("Current Node:")
+        # current_node.print_node()
+        # print(current_node.practices)
 
-        print("Child Nodes:", len(current_node.children))
-        for child in current_node.children:
-            child.print_node()
+        # print("Child Nodes:", len(current_node.children))
+        # for child in current_node.children:
+        #     child.print_node()
 
 
         # Fbound
         fbound = Fbound(soft_constraints)
         filtered_children = fbound.filter_nodes(current_node, current_node.children)
-        for child in filtered_children:
-            child.print_node()
+        # for child in filtered_children:
+        #     child.print_node()
 
         if (len(filtered_children) == 0):
             break
@@ -180,7 +180,7 @@ if __name__ == "__main__":
         fleaf = Fleaf(soft_constraints)
         choose_lowest_eval_leaf = fleaf.choose_lowest_eval_leaf(current_node, filtered_children)
         checked_leafs.append(choose_lowest_eval_leaf)
-        choose_lowest_eval_leaf.print_node()
+        # choose_lowest_eval_leaf.print_node()
         
         # Ftrans
         ftrans = Ftrans(soft_constraints)
@@ -192,17 +192,17 @@ if __name__ == "__main__":
         if (len(transition_to_leaf.get_remaining_games()) == 0
             and len(transition_to_leaf.get_remaining_practices()) == 0):
             
-            print(transition_to_leaf.get_remaining_practices())
+            # print(transition_to_leaf.get_remaining_practices())
 
             completed_schedules.append(transition_to_leaf)
-            print(True)
+            # print(True)
             for child in filtered_children:
                 if child not in checked_leafs:
                     current_node = child
         else:
             current_node = transition_to_leaf
 
-    print("Completed Schedules: ", len(completed_schedules))
+    # print("Completed Schedules: ", len(completed_schedules))
     
     best_schedule = min(completed_schedules, key=soft_constraints.eval)
 
