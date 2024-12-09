@@ -60,11 +60,43 @@ class HardConstraints:
             if not game_slot.assigned_games:
                 continue
             for practice_slot in slots:
-                if not practice_slot.assigned_practices or game_slot.day != practice_slot.day or game_slot.start_time != practice_slot.start_time:
+                if not practice_slot.assigned_practices:
                     continue
+                if (game_slot.day == "MO" and (practice_slot.day != "MO" and practice_slot.day != "FR")) or \
+                    (game_slot.day == "MO" and game_slot.start_time != practice_slot.start_time):
+                    continue
+                if game_slot.day == "TU" and practice_slot.day != "TU":
+                    continue
+                elif game_slot.start_time == "8:00":
+                    if practice_slot.start_time != "8:00" and practice_slot.start_time != "9:00":
+                        continue
+                elif game_slot.start_time == "9:30":
+                    if practice_slot.start_time != "9:00" and practice_slot.start_time != "10:00":
+                        continue
+                elif game_slot.start_time == "11:00":
+                    if practice_slot.start_time != "11:00" and practice_slot.start_time != "12:00":
+                        continue
+                elif game_slot.start_time == "12:30":
+                    if practice_slot.start_time != "12:00" and practice_slot.start_time != "13:00":
+                        continue
+                elif game_slot.start_time == "14:00":
+                    if practice_slot.start_time != "14:00" and practice_slot.start_time != "15:00":
+                        continue
+                elif game_slot.start_time == "15:30":
+                    if practice_slot.start_time != "15:00" and practice_slot.start_time != "16:00":
+                        continue
+                elif game_slot.start_time == "17:00":
+                    if practice_slot.start_time != "17:00" and practice_slot.start_time != "18:00":
+                        continue
+                elif game_slot.start_time == "18:30":
+                    if practice_slot.start_time != "18:00" and practice_slot.start_time != "19:00":
+                        continue
                 for game in game_slot.assigned_games:
                     for practice in practice_slot.assigned_practices:
-                        if game in practice:
+                        if "DIV" in practice:
+                            if game in practice:
+                                return False
+                        elif game[:10] in practice:
                             return False
         if (debug):
             print("  True")

@@ -30,14 +30,17 @@ class Fbound:
             return children_nodes
 
         # Sort children by evaluation value (highest to lowest)
-        evaluated_children = sorted(children_nodes, key=self.soft_constraints.eval, reverse=True)
+        # evaluated_children = sorted(children_nodes, key=self.soft_constraints.eval, reverse=True)
 
-        # Calculate how many nodes to remove (40% rounded up)
-        num_to_remove = math.ceil(0.4 * len(children_nodes))
+        # # Calculate how many nodes to remove (40% rounded up)
+        # num_to_remove = math.ceil(0.4 * len(children_nodes))
 
-        # Retain the remaining 60%
-        remaining_children = evaluated_children[num_to_remove:]
-        return remaining_children
+        # # Retain the remaining 60%
+        # remaining_children = evaluated_children[num_to_remove:]
+        # return remaining_children
+
+        retain_count = math.ceil(0.6 * len(children_nodes))
+        return sorted(children_nodes, key=self.soft_constraints.eval, reverse=True)[:retain_count]
 
 class Fleaf:
     """

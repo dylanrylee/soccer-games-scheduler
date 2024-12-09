@@ -80,10 +80,14 @@ def parse_input(file_path: str) -> Tuple[List[Slot], List[Game], List[Practice],
                 game_id = match.group(1)
                 practice_id = line
                 # Find or create the corresponding game
-                game = next((g for g in games if g.identifier == game_id), None)
-                if game:
-                    practice = Practice(practice_id, game, match.group(2))  
-                    game.practices.append(practice)
+                if "DIV" in game_id:
+                    game = next((g for g in games if g.identifier == game_id), None)
+                    if game:
+                        practice = Practice(practice_id, game, match.group(2))  
+                        game.practices.append(practice)
+                        practices.append(practice)
+                else:
+                    practice = Practice(practice_id, Game(game_id, "", "", "", ""), match.group(2))
                     practices.append(practice)
         elif section == "not_compatible":
             items = line.split(", ")[:2]
@@ -225,7 +229,8 @@ if __name__ == "__main__":
                 
         if slot.assigned_practices:
             for practice in slot.assigned_practices:
-                output_list.append(f"{practice}      : {slot.day}, {slot.start_time}")
+                buffer = " " * (30 - len(practice))
+                output_list.append(f"{practice}{buffer}: {slot.day}, {slot.start_time}")
 
     grr = sorted(output_list)
 
