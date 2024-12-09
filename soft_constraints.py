@@ -1,6 +1,6 @@
 from typing import List, Tuple
-from scheduler_structures import *
-from AndTreeNode import *
+from prob_set import *
+from and_tree_node import AndTreeNode
 
 class SoftConstraints:
     def __init__(self, pen_game_min: int, pen_practice_min: int, w_min_filled: int,
@@ -66,13 +66,15 @@ class SoftConstraints:
     def consider_city_separate_divisions(games: List[Game], pen_section: int):
         penalty = 0
         for game in games:
-            for other_game in games:
-                if (game.identifier == other_game.identifier or
-                    game.age_group != other_game.age_group or
-                    game.tier != other_game.tier):
-                    continue
-                if (game.assigned_slot.day == other_game.assigned_slot.day and
-                    game.assigned_slot.start_time == other_game.assigned_slot.start_time and
-                    game.division != other_game.division):
-                    penalty += pen_section
+            if game.assigned_slot != None:
+                for other_game in games:
+                    if (other_game.assigned_slot == None or
+                        game.identifier == other_game.identifier or
+                        game.age_group != other_game.age_group or
+                        game.tier != other_game.tier):
+                        continue
+                    if (game.assigned_slot.day == other_game.assigned_slot.day and
+                        game.assigned_slot.start_time == other_game.assigned_slot.start_time and
+                        game.division != other_game.division):
+                        penalty += pen_section
         return penalty

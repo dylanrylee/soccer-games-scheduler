@@ -1,98 +1,119 @@
-from scheduler_structures import *
+from typing import List, Dict
 from hard_constraints import *
 from soft_constraints import *
-from AndTreeNode import *
+from and_tree_node import *
 from search_process import *
-from typing import Dict, Tuple
+import re
 import sys
 
-
-class Main:
-    def __init__(self):
-        self.slots: List[Slot] = []
-        self.games: List[Game] = []
-        self.practices: List[Practice] = []
-        self.not_compatible: List[Tuple[str, str]] = []
-        self.unwanted: List[Tuple[str, Slot]] =[]
-        self.slot_preferences: List[Tuple[str, str, str, str]] = []
-        self.pairs: List[Tuple[str, str]] = []
-        self.partial_assignments: Dict[str, Slot] = {}
-
-    def add_game_slot(self, slot: Slot):
-        self.slots.append(slot)
-
-    def add_practice_slot(self, slot: Slot):
-        for check in self.slots:
-            if check.day == slot.day and check.start_time == slot.start_time:
-                check.max_practices = slot.max_practices
-                check.min_practices = slot.min_practices
-                return
-        self.slots.append(slot)
-
-    def add_game(self, game: Game):
-        self.games.append(game)
-
-    def add_practice(self, practice: Practice):
-        self.practices.append(practice)
-
-    def add_not_compatible(self, not_compatible: Tuple[str, str]):
-        self.not_compatible.append(not_compatible)
-
-    def add_unwanted(self, unwanted: Tuple[str, Slot]):
-        self.unwanted.append(unwanted)
-
-    def add_slot_preferences(self, slot_pref: Tuple[str, str, str, str]):
-        self.slot_preferences.append(slot_pref)
-
-    def add_pair(self, pair: Tuple[str, str]):
-        self.pairs.append(pair)
-
-    def add_partial_assignment(self, identifier: str, slot: Slot):
-        self.partial_assignments[identifier] = slot
-
-    def assign_games_to_slots(self):
-        for game in self.games:
-            for slot in self.slots:
-                if game.assign_slot(slot):
-                    print(f"Assigned {game.identifier} to slot.")
-                    break
-            else:
-                print(f"Failed to assign {game.identifier} to any slot.")
-
-    def assign_practices_to_slots(self):
-        for practice in self.practices:
-            for slot in self.slots:
-                if practice.assign_slot(slot):
-                    print(f"Assigned {practice.identifier} to slot.")
-                    break
-            else:
-                print(f"Failed to assign {practice.identifier} to any slot.")
-                
-    def find_slot(self, day: str, start_time: str):
-        for slot in self.slots:
-            if slot.day == day and slot.start_time == start_time:
-                return slot
-        return Slot(day, start_time, 0, 0, 0, 0)
-
-def read_file(file_path: str) -> str:
+def parse_input(file_path: str) -> Tuple[List[Slot], List[Game], List[Practice], Dict[str, List]]:
+    """
+    Parses the input file to extract game slots, practice slots, games, practices, and constraints.
+    """
     with open(file_path, 'r') as file:
-        return file.read()
+        lines = file.readlines()
 
-def parse_sections(content: str):
-    sections = content.split('\n\n')
-    parsed_data = {}
-    for section in sections:
-        lines = section.split('\n')
-        header = lines[0].strip(':')
-        data = lines[1:]
-        parsed_data[header] = data
-    return parsed_data
+    # Initialize containers
+    slots = []
+    games = []
+    practices = []
+    not_compatible = []
+    unwanted = []
+    pair = []
+    part_assign = []
+    preferences = []
 
-# Example usage
+    # Parse the file
+    section = None
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue  # Skip empty lines
+
+        # Identify sections
+        if line.startswith("Game slots:"):
+            section = "game_slots"
+            continue
+        elif line.startswith("Practice slots:"):
+            section = "practice_slots"
+            continue
+        elif line.startswith("Games:"):
+            section = "games"
+            continue
+        elif line.startswith("Practices:"):
+            section = "practices"
+            continue
+        elif line.startswith("Not compatible:"):
+            section = "not_compatible"
+            continue
+        elif line.startswith("Unwanted:"):
+            section = "unwanted"
+            continue
+        elif line.startswith("Pair:"):
+            section = "pair"
+            continue
+        elif line.startswith("Partial assignments:"):
+            section = "partial_assignments"
+            continue
+        elif line.startswith("Preferences:"):
+            section = "preferences"
+            continue
+
+        # Parse each section
+        if section == "game_slots":
+            day, time, max_games, min_games = line.split(", ")[:4]
+            slots.append(Slot(day, time, int(max_games), int(min_games), 0, 0))
+        elif section == "practice_slots":
+            day, time, max_practices, min_practices = line.split(", ")
+            slots.append(Slot(day, time, 0, 0, int(max_practices), int(min_practices)))
+        elif section == "games":
+            games.append(Game(line, "", "", "", ""))
+        elif section == "practices":
+            # Parse practice ID
+            match = re.match(r"^(.*) (PRC|OPN) \d+$", line)
+            if match:
+                game_id = match.group(1)
+                practice_id = line
+                # Find or create the corresponding game
+                game = next((g for g in games if g.identifier == game_id), None)
+                if game:
+                    practice = Practice(practice_id, game, match.group(2))  
+                    game.practices.append(practice)
+                    practices.append(practice)
+        elif section == "not_compatible":
+            items = line.split(", ")[:2]
+            not_compatible.append((items[0], items[1]))
+        elif section == "unwanted":
+            parts = line.split(", ")[:3]
+            print(parts)
+            identifier = parts[0]
+            day = parts[1]
+            time = parts[2]
+            unwanted.append((identifier, Slot(day, time, 0, 0, 0, 0)))
+        elif section == "pair":
+            split = line.split(", ")[:2]
+            first = split[0]
+            second = split[1]
+            pair.append(first)
+            pair.append(second)
+        elif section == "preferences":
+            split = line.rsplit(", ", 2)[:3]
+            preferences = [split[0], split[1], split[2]]
+
+    constraints = {
+        "not_compatible": not_compatible,
+        "unwanted": unwanted,
+        "pair": pair,
+        "preferences": preferences,
+        "part_assign": part_assign
+    }
+    return slots, games, practices, constraints
+
+
+# Example Usage
 if __name__ == "__main__":
 
-    # Take in the command line arguments
-    file_name = sys.argv[1]
+    file_path = sys.argv[1]
     w_min_filled = sys.argv[2]
     w_pref = sys.argv[3]
     w_pair = sys.argv[4]
@@ -101,104 +122,107 @@ if __name__ == "__main__":
     pen_practice_min = sys.argv[7]
     pen_not_paired = sys.argv[8]
     pen_section = sys.argv[9]
+    
+    # Parse the file
+    slots, games, practices, constraints = parse_input(file_path)
 
-    # Read the file content
-    file_content = read_file(file_name)
+    # Initialize hard constraints
+    hard_constraints = HardConstraints(
+        not_compatible=constraints["not_compatible"],
+        part_assign=constraints["part_assign"],
+        unwanted=constraints["unwanted"],
+        debug=False
+    )
 
-    # Parse the sections
-    parsed_data = parse_sections(file_content)
+    # SoftConstraints
+    soft_constraints = SoftConstraints(
+        pen_game_min=int(pen_game_min),
+        pen_practice_min=int(pen_practice_min),
+        w_min_filled=int(w_min_filled),
+        slot_pref=constraints["preferences"],
+        w_pref=int(w_pref),
+        pair_pref=constraints["pair"],
+        pen_not_paired=int(pen_not_paired),
+        w_pair=int(w_pair),
+        pen_section=int(pen_section),
+        w_sec_diff=int(w_sec_diff)
+    )
 
-    # Create Main object
-    main = Main()
+    # Create the root node
+    current_node = AndTreeNode(slots=slots, games=games, practices=practices)
 
-   # Create GameSlot objects from input strings and add them to Main
-    for input_string in parsed_data['Game slots']:
-        day, time, max_games, min_games = input_string.replace(",", "").split()
-        slot = Slot(day, time, int(max_games), int(min_games), 0, 0)
-        main.add_game_slot(slot)
+    checked_leafs: List[AndTreeNode] = []
+    completed_schedules: List[AndTreeNode] = []
 
-    # Create PracticeSlot objects from input strings and add them to Main
-    for input_string in parsed_data['Practice slots']:
-        day, time, max_practices, min_practices = input_string.replace(",", "").split()
-        slot = Slot(day, time, 0, 0, int(max_practices), int(min_practices))
-        main.add_practice_slot(slot)
+    while True:
 
-    # Create Game objects from input strings and add them to Main
-    for input_string in parsed_data['Games']:
-        values = input_string.split()
-        game = Game(input_string, values[0], values[1][:3], values[1][3:], values[2] + " " + values[3])
-        main.add_game(game)
+        current_node.expand(constrained_expansion_logic, hard_constraints)
 
-    # Create Practice objects from input strings and add them to Main
-    for input_string in parsed_data['Practices']:
-        # practice = Practice.from_string(input_string)
-        values = input_string.split()
-        practice = Practice(input_string, f"{values[0]} {values[1]} {values[2]} {values[3]}", "")
-        main.add_practice(practice)
+        print("Current Node:")
+        current_node.print_node()
+        print(current_node.practices)
 
-    # Add incompatible pairs to Main
-    for input_string in parsed_data['Not compatible']:
-        values = input_string.split(",")
-        values[1] = values[1].lstrip()
-        not_com = tuple(values)
-        # print(not_com)
-        main.add_not_compatible(not_com)
+        print("Child Nodes:", len(current_node.children))
+        for child in current_node.children:
+            child.print_node()
 
-    # print("Unwanted")
-    # Add unwanted pairs to Main
-    for input_string in parsed_data['Unwanted']:
-        values = input_string.split(",")
-        values[1] = values[1].lstrip()
-        values[2] = values[2].lstrip()
-        slot = main.find_slot(values[1], values[2])
-        pair = (values[0], slot)
-        # print(pair)
-        main.add_unwanted(pair)
+
+        # Fbound
+        fbound = Fbound(soft_constraints)
+        filtered_children = fbound.filter_nodes(current_node, current_node.children)
+        for child in filtered_children:
+            child.print_node()
+
+        if (len(filtered_children) == 0):
+            break
+
+        # Fleaf
+        fleaf = Fleaf(soft_constraints)
+        choose_lowest_eval_leaf = fleaf.choose_lowest_eval_leaf(current_node, filtered_children)
+        checked_leafs.append(choose_lowest_eval_leaf)
+        choose_lowest_eval_leaf.print_node()
         
-    # print("Slot preferences")
-    # Add slot preferences to Main
-    for input_string in parsed_data['Preferences']:
-        values = input_string.split(",")
-        values[1] = values[1].lstrip()
-        values[2] = values[2].lstrip()
-        values[3] = values[3].lstrip()
-        slot_pref = tuple(values)
-        # print(slot_pref)
-        main.add_slot_preferences(slot_pref)
+        # Ftrans
+        ftrans = Ftrans(soft_constraints)
+        transition_to_leaf = ftrans.transition_to_leaf(current_node, choose_lowest_eval_leaf)
 
-    # print("Pair preferences")
-    # Add pair preferences to Main
-    for input_string in parsed_data['Pair']:
-        values = input_string.split(",")
-        values[1] = values[1].lstrip()
-        pair = tuple(values)
-        # print(pair)
-        main.add_pair(pair)
+        if (transition_to_leaf == choose_lowest_eval_leaf):
+            completed_schedules.append(transition_to_leaf)
 
-    # Add partial assignments to Main
-    for input_string in parsed_data['Partial assignments']:
-        values = input_string.split(",")
-        identifier = values[0]
-        day = values[1].lstrip()
-        start_time = values[2].lstrip()
-        slot = main.find_slot(day, start_time)
-        main.add_partial_assignment(identifier, slot)
+        if (len(transition_to_leaf.get_remaining_games()) == 0
+            and len(transition_to_leaf.get_remaining_practices()) == 0):
+            
+            print(transition_to_leaf.get_remaining_practices())
+
+            completed_schedules.append(transition_to_leaf)
+            print(True)
+            for child in filtered_children:
+                if child not in checked_leafs:
+                    current_node = child
+        else:
+            current_node = transition_to_leaf
+
+    print("Completed Schedules: ", len(completed_schedules))
     
-    hard_constraints = HardConstraints(main.not_compatible, main.partial_assignments,
-                                       main.unwanted, False)
-    soft_constraints = SoftConstraints(pen_game_min, pen_practice_min, w_min_filled,
-                                       main.slot_preferences, w_pref, main.pairs,
-                                       pen_not_paired, w_pair, pen_section, w_sec_diff)
-    
-    # print(hard_constraints)
-    # print("\n\n")
-    # print(soft_constraints)
-    
-    root_node = AndTreeNode(main.slots, main.games, main.practices, 0)
-    search_process = SearchProcess(root_node, hard_constraints, soft_constraints)
+    best_schedule = min(completed_schedules, key=soft_constraints.eval)
 
-    print(search_process)
+    # Print games and practices schedule by iterating through slots
+    print("Eval:", soft_constraints.eval(best_schedule))
 
-    # Assign games and practices to slots
-    # main.assign_games_to_slots()
-    # main.assign_practices_to_slots()
+    # Iterate over all slots in the best schedule
+    output_list: List[str] = []
+    for slot in best_schedule.slots:
+        # Check if there are any games assigned to the slot
+        if slot.assigned_games:
+            for game in slot.assigned_games:
+                # Print the game assigned to this slot
+                output_list.append(f"{game}             : {slot.day}, {slot.start_time}")
+                
+        if slot.assigned_practices:
+            for practice in slot.assigned_practices:
+                output_list.append(f"{practice}      : {slot.day}, {slot.start_time}")
+
+    grr = sorted(output_list)
+
+    for elem in grr:
+        print(elem) 

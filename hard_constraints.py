@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from scheduler_structures import Game, Practice, Slot
+from prob_set import Game, Practice, Slot
 
 class HardConstraints:
     def __init__(self, not_compatible: List[Tuple[str, str]],
@@ -16,9 +16,7 @@ class HardConstraints:
             HardConstraints.enforce_no_simultaneous_assignment(games, practices, self.debug) and
             HardConstraints.enforce_respect_not_compatible(self.not_compatible, slots, self.debug) and
             HardConstraints.enforce_respect_part_assign(slots, self.part_assign, self.debug) and
-            HardConstraints.enforce_respect_unwanted(slots, self.unwanted, self.debug) and
-            HardConstraints.enforce_city_hard_constraints(slots, games, practices, self.debug))
-        # print(val)
+            HardConstraints.enforce_respect_unwanted(slots, self.unwanted, self.debug))
         return val
     
     def __repr__(self):
@@ -26,7 +24,7 @@ class HardConstraints:
                 f"PartAssign={self.part_assign}, Unwanted={self.unwanted}, "
                 f"Debug={self.debug})")
 
-    def enforce_game_max(slots: List[Slot], debug = False):
+    def enforce_game_max(slots: List[Slot], debug = False) -> bool:
         if (debug):
             print("enforce_game_max:")
         for slot in slots:
@@ -40,7 +38,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_practice_max(slots: List[Slot], debug = False):
+    def enforce_practice_max(slots: List[Slot], debug = False) -> bool:
         if (debug):
             print("enforce_practice_max:")
         for slot in slots:
@@ -53,8 +51,8 @@ class HardConstraints:
         if (debug):
             print("  True")
         return True
-    
-    def enforce_no_simultaneous_assignment(games: List[Game], practices: List[Practice], debug = False):
+
+    def enforce_no_simultaneous_assignment(games: List[Game], practices: List[Practice], debug = False) -> bool:
         if (debug):
             print("enforce_no_simultaneous_assignment:")
         for game in games:
@@ -63,7 +61,8 @@ class HardConstraints:
             for practice in practices:
                 if (debug):
                     print("    " + practice.__repr__())
-                if (game.identifier == practice.associated_game and game.assigned_slot == practice.assigned_slot):
+                if (game.assigned_slot != None and practice.assigned_slot != None and
+                    game.identifier == practice.associated_game and game.assigned_slot == practice.assigned_slot):
                     if (debug):
                         print("      False")
                     return False
@@ -71,7 +70,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_respect_not_compatible(not_compatible, slots: List[Slot], debug = False):
+    def enforce_respect_not_compatible(not_compatible, slots: List[Slot], debug = False) -> bool:
         if (debug):
             print("enforce_respect_not_compatible:")
         for slot in slots:
@@ -89,7 +88,7 @@ class HardConstraints:
             print("  True")
         return True
 
-    def enforce_respect_part_assign(slots: List[Slot], part_assign: List[Tuple[Slot, str]], debug = False):
+    def enforce_respect_part_assign(slots: List[Slot], part_assign: List[Tuple[Slot, str]], debug = False) -> bool:
         if (debug):
             print("enforce_respect_part_assign:")
         for assign in part_assign:
@@ -107,7 +106,7 @@ class HardConstraints:
             print("  True")
         return True
 
-    def enforce_respect_unwanted(slots: List[Slot], unwanted: List[Tuple[str, Slot]], debug = False):
+    def enforce_respect_unwanted(slots: List[Slot], unwanted: List[Tuple[str, Slot]], debug = False) -> bool:
         if (debug):
             print("enforce_respect_unwanted:")
         for avoid in unwanted:
@@ -125,7 +124,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_city_hard_constraints(slots: List[Slot], games: List[Game], practices: List[Practice], debug = False):
+    def enforce_city_hard_constraints(slots: List[Slot], games: List[Game], practices: List[Practice], debug = False) -> bool:
         if (debug):
             print("")
         return (HardConstraints.enforce_city_abstract_slots(slots, debug) and
@@ -152,13 +151,13 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_city_evening_division_assignment(games: List[Game], practices: List[Practice], debug = False):
+    def enforce_city_evening_division_assignment(games: List[Game], practices: List[Practice], debug = False) -> bool:
         if (debug):
             print("enforce_evening_division_assignment")
         for game in games:
             if (debug):
                 print(f"  {game}")
-            if "DIV 9" not in game.division:
+            if "DIV 9" not in game.division or game.assigned_slot == None:
                 continue
             if game.assigned_slot.day == "MO" and game.assigned_slot.start_time not in ["18:00", "19:00", "20:00"]:
                 if (debug):
@@ -173,11 +172,12 @@ class HardConstraints:
                 print(f"  {practice}")
             evening_div = False
             for game in games:
-                print(f"    {game}")
+                if (debug):
+                    print(f"    {game}")
                 if (game.identifier == practice.associated_game):
                     evening_div = "DIV 9" in game.division
                     break
-            if (evening_div == False):
+            if (evening_div == False or practice.assigned_slot == None):
                 continue
             if practice.assigned_slot.day in ["MO", "TU"] and practice.assigned_slot.start_time not in ["18:00", "19:00", "20:00"]:
                 if (debug):
@@ -191,7 +191,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_city_avoid_overlap(games: List[Game], debug = False):
+    def enforce_city_avoid_overlap(games: List[Game], debug = False) -> bool:
         if (debug):
             print("enforce_city_avoid_overlap")
         for game in games:
@@ -220,7 +220,7 @@ class HardConstraints:
         for game in games:
             if (debug):
                 print(f"  {game}")
-            if game.assigned_slot.day == "TU" and game.assigned_slot.start_time == "11:00":
+            if game.assigned_slot != None and game.assigned_slot.day == "TU" and game.assigned_slot.start_time == "11:00":
                 if (debug):
                     print("    False")
                 return False
@@ -228,7 +228,7 @@ class HardConstraints:
             print("  True")
         return True
     
-    def enforce_city_tryout_bookings(games: List[Game], practices: List[Practice], debug = False):
+    def enforce_city_tryout_bookings(games: List[Game], practices: List[Practice], debug = False) -> bool:
         if (debug):
             print("enforce_city_tryout_bookings")
         u12_id = ""
@@ -236,6 +236,8 @@ class HardConstraints:
         u12_tryout_id = ""
         u13_tryout_id = ""
         for game in games:
+            if game.assigned_slot == None:
+                continue
             if game.tier == "T1S" and game.league == "CMSA" and game.age_group == "U12":
                 if game.assigned_slot.day != "TU" or game.assigned_slot.start_time != "18:00":
                     return False
@@ -259,6 +261,7 @@ class HardConstraints:
         for practice in practices:
             if ((practice.associated_game == u12_id or practice.associated_game == u12_tryout_id or
                 practice.associated_game == u13_id or practice.associated_game == u13_tryout_id) and
-                (practice.assigned_slot.start_time == "18:00" and practice.assigned_slot.day == "TU")):
+                (practice.assigned_slot != None and
+                 practice.assigned_slot.start_time == "18:00" and practice.assigned_slot.day == "TU")):
                 return False
         return True
