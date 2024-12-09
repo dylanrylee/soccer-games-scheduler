@@ -237,19 +237,17 @@ class HardConstraints:
     def enforce_city_tryout_bookings(slots: List[Slot], debug = False) -> bool:
         if (debug):
             print("enforce_city_tryout_bookings")
-        u12 = False
-        u13 = False
         for slot in slots:
-            for game in slot.assigned_games:
-                if "CMSA U12T1" in game:
-                    u12 = True
-                if "CMSA U13T1" in game:
-                    u13 = True
-        for slot in slots:
-            if slot.day == "TU" and slot.start_time == "18:00":
+            if slot.day == "TU" and (slot.start_time == "17:00" or slot.start_time == "18:30"):
                 for game in slot.assigned_games:
-                    if u12 and "CMSA U12T1" in game:
+                    if "CMSA U12T1" in game:
                         return False
-                    if u13 and "CMSA U13T1" in game:
+                    if "CMSA U13T1" in game:
+                        return False
+            if slot.day == "TU" and slot.start_time == "18:00":
+                for practice in slot.assigned_practices:
+                    if "CMSA U12T1" in practice and "CMSA U12T1S" not in practice:
+                        return False
+                    if "CMSA U13T1" in practice and "CMSA U13T1S" not in practice:
                         return False
         return True

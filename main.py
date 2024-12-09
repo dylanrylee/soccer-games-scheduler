@@ -73,6 +73,14 @@ def parse_input(file_path: str) -> Tuple[List[Slot], List[Game], List[Practice],
             tier = split[1][3:]
             division = f"{split[2]} {split[3]}"
             games.append(Game(line, league, age, tier, division))
+            if league == "CMSA" and age == "U12" and tier == "T1":
+                for slot in slots:
+                    if slot.day == "TU" and slot.start_time == "18:00":
+                        slot.assigned_practices.append("CMSA U12T1S")
+            elif league == "CMSA" and age == "U13" and tier == "T1":
+                for slot in slots:
+                    if slot.day == "TU" and slot.start_time == "18:00":
+                        slot.assigned_practices.append("CMSA U13T1S")
         elif section == "practices":
             # Parse practice ID
             match = re.match(r"^(.*) (PRC|OPN) \d+$", line)
