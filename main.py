@@ -102,7 +102,6 @@ def parse_input(file_path: str) -> Tuple[List[Slot], List[Game], List[Practice],
             not_compatible.append((items[0], items[1]))
         elif section == "unwanted":
             parts = line.split(", ")[:3]
-            # print(parts)
             identifier = parts[0]
             day = parts[1]
             time = parts[2]
@@ -112,10 +111,15 @@ def parse_input(file_path: str) -> Tuple[List[Slot], List[Game], List[Practice],
             first = split[0]
             second = split[1]
             pair.append((first, second))
-            # pair.append(second)
+        elif section == "partial_assignments":
+            split = line.split(", ")
+            identifier = split[0]
+            day = split[1]
+            time = split[2]
+            part_assign.append((Slot(day, time, 0, 0, 0, 0), identifier))
         elif section == "preferences":
-            split = line.rsplit(", ")[:4]
-            preferences = [split[0], split[1], split[2], split[3]]
+            split = line.split(", ")[:4]
+            preferences.append([split[0], split[1], split[2], split[3]])
 
     constraints = {
         "not_compatible": not_compatible,
@@ -126,27 +130,66 @@ def parse_input(file_path: str) -> Tuple[List[Slot], List[Game], List[Practice],
     }
     return slots, games, practices, constraints
 
-# def IterateTree(node: AndTreeNode, soft_constraints: SoftConstraints, hard_constraints: HardConstraints):
-#     completed_schedules = []
+# Recursively explore the tree, depth first
+def TraverseTree(current_node: AndTreeNode, hard_constraints: HardConstraints, soft_constraints: SoftConstraints) -> List[AndTreeNode]:
+    # Initialize empty lists
+    completed_schedules: List[AndTreeNode] = []
+    unchecked_leaves: List[AndTreeNode] = []
 
-#     node.expand(constrained_expansion_logic, hard_constraints)
-
-#     retain_count = math.ceil(0.6 * len(node.children))
-#     for child in sorted(node.children, key=soft_constraints.eval, reverse=True)[:retain_count]:
-#         if len(child.get_remaining_games() == 0) and len(child.get_remaining_practices() == 0):
-#             completed_schedules.append(child)
-#         else:
-#             for schedule in IterateTree(child, soft_constraints, hard_constraints):
-#                 completed_schedules.append(schedule)
-
-#     return completed_schedules
-
+    # Generate valid child nodes, checking against hard constraints
+    current_node.expand(constrained_expansion_logic, hard_constraints)
     
-        # return sorted(children_nodes, key=self.soft_constraints.eval, reverse=True)[:retain_count]
-        
+    # If none were generated, check to see if this is a full schedule. If so, return it
+    if not current_node.children:
+        if (len(current_node.get_remaining_games()) == 0
+            and len(current_node.get_remaining_practices()) == 0):
+            return [current_node]
+        else:
+            return []
+    # If children were generated, iterate over the children
+    else:
+        for child in current_node.children:
+            unchecked_leaves.append(child)
 
+    # Sort the leaves by eval
+    filtered_leaves = sorted(unchecked_leaves, key=soft_constraints.eval, reverse=True)
+    # Recursively explore the sorted list, sorted by lowest penalty first
+    for leaf in filtered_leaves:
+        for schedule in TraverseTree(leaf, hard_constraints, soft_constraints):
+            completed_schedules.append(schedule)
 
-# Example Usage
+    return completed_schedules
+
+# If a full schedule exists, display the best one. Otherwise, declare there is no valid solution
+def PrintBestSchedule(completed_schedules: List[AndTreeNode], soft_constraints: SoftConstraints):
+    if completed_schedules:
+        best_schedule = min(completed_schedules, key=soft_constraints.eval)
+
+        # Print games and practices schedule by iterating through slots
+        print("Eval:", soft_constraints.eval(best_schedule))
+
+        # Iterate over all slots in the best schedule
+        output_list: List[str] = []
+        for slot in best_schedule.slots:
+            # Check if there are any games assigned to the slot
+            if slot.assigned_games:
+                for game in slot.assigned_games:
+                    # Print the game assigned to this slot
+                    output_list.append(f"{game}             : {slot.day}, {slot.start_time}")
+                    
+            if slot.assigned_practices:
+                for practice in slot.assigned_practices:
+                    buffer = " " * (30 - len(practice))
+                    output_list.append(f"{practice}{buffer}: {slot.day}, {slot.start_time}")
+
+        grr = sorted(output_list)
+
+        for elem in grr:
+            print(elem)
+    else:
+        print("No valid solution")
+
+# Start the program
 if __name__ == "__main__":
 
     file_path = sys.argv[1]
@@ -187,83 +230,6 @@ if __name__ == "__main__":
     # Create the root node
     current_node = AndTreeNode(slots=slots, games=games, practices=practices)
 
-    checked_leafs: List[AndTreeNode] = []
-    completed_schedules: List[AndTreeNode] = []
+    completed_schedules = TraverseTree(current_node, hard_constraints, soft_constraints)
 
-    while True:
-
-        current_node.expand(constrained_expansion_logic, hard_constraints)
-
-        # print("Current Node:")
-        # current_node.print_node()
-        # print(current_node.practices)
-
-        # print("Child Nodes:", len(current_node.children))
-        # for child in current_node.children:
-        #     child.print_node()
-
-
-        # Fbound
-        fbound = Fbound(soft_constraints)
-        filtered_children = fbound.filter_nodes(current_node, current_node.children)
-        # for child in filtered_children:
-        #     child.print_node()
-
-        if (len(filtered_children) == 0):
-            break
-
-        # Fleaf
-        fleaf = Fleaf(soft_constraints)
-        choose_lowest_eval_leaf = fleaf.choose_lowest_eval_leaf(current_node, filtered_children)
-        checked_leafs.append(choose_lowest_eval_leaf)
-        # choose_lowest_eval_leaf.print_node()
-        
-        # Ftrans
-        ftrans = Ftrans(soft_constraints)
-        transition_to_leaf = ftrans.transition_to_leaf(current_node, choose_lowest_eval_leaf)
-
-        # if (transition_to_leaf == choose_lowest_eval_leaf):
-        #     completed_schedules.append(transition_to_leaf)
-
-        if (len(transition_to_leaf.get_remaining_games()) == 0
-            and len(transition_to_leaf.get_remaining_practices()) == 0):
-            
-            # print(transition_to_leaf.get_remaining_practices())
-
-            completed_schedules.append(transition_to_leaf)
-            # print(True)
-            for child in filtered_children:
-                if child not in checked_leafs:
-                    current_node = child
-        else:
-            current_node = transition_to_leaf
-
-    # print("Completed Schedules: ", len(completed_schedules))
-    
-    if completed_schedules:
-        best_schedule = min(completed_schedules, key=soft_constraints.eval)
-    
-
-        # Print games and practices schedule by iterating through slots
-        print("Eval:", soft_constraints.eval(best_schedule))
-
-        # Iterate over all slots in the best schedule
-        output_list: List[str] = []
-        for slot in best_schedule.slots:
-            # Check if there are any games assigned to the slot
-            if slot.assigned_games:
-                for game in slot.assigned_games:
-                    # Print the game assigned to this slot
-                    output_list.append(f"{game}             : {slot.day}, {slot.start_time}")
-                    
-            if slot.assigned_practices:
-                for practice in slot.assigned_practices:
-                    buffer = " " * (30 - len(practice))
-                    output_list.append(f"{practice}{buffer}: {slot.day}, {slot.start_time}")
-
-        grr = sorted(output_list)
-
-        for elem in grr:
-            print(elem) 
-    else:
-        print("No valid solution!")
+    PrintBestSchedule(completed_schedules, soft_constraints)

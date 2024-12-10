@@ -19,7 +19,6 @@ class SoftConstraints:
         self.w_sec_diff = w_sec_diff
 
     def eval(self, node: AndTreeNode):
-        print("test")
         val = (SoftConstraints.consider_minimum_assignment(node.slots, self.pen_game_min, self.pen_practice_min) * self.w_min_filled +
                 SoftConstraints.consider_slot_preference(node.slots, self.slot_pref) * self.w_pref +
                 SoftConstraints.consider_pair_preference(node.slots, self.pair_pref, self.pen_not_paired) * self.w_pair +
@@ -45,22 +44,18 @@ class SoftConstraints:
     
     def consider_slot_preference(slots: List[Slot], slot_pref: List[Tuple[str, str, str, str]]):
         penalty = 0
-        print(f"{slot_pref}")
         for pref in slot_pref:
             for slot in slots:
                 if (slot.day == pref[0] and slot.start_time == pref[1] and
                     pref[2] not in slot.assigned_games and pref[2] not in slot.assigned_practices):
                     penalty += int(pref[3])
-                    break
         return penalty
 
 
     def consider_pair_preference(slots: List[Slot], pair_pref: List[Tuple[str, str]], pen_not_paired: int):
         penalty = 0
-        print("pair pref")
         for slot in slots:
             for pair in pair_pref: 
-                print(pair)
                 if ((pair[0] in slot.assigned_games or pair[0] in slot.assigned_practices) and
                     (pair[1] not in slot.assigned_games and pair[1] not in slot.assigned_practices)):
                     penalty += pen_not_paired
@@ -72,8 +67,8 @@ class SoftConstraints:
     def consider_city_separate_divisions(slots: List[Slot], pen_section: int):
         penalty = 0
         for slot in slots:
-            for game in slot.assigned_games:
-                for other_game in slot.assigned_games:
+            for index, game in enumerate(slot.assigned_games):
+                for other_game in slot.assigned_games[index:]:
                     if game != other_game:
                         if game[:10] == other_game[:10]:
                             penalty += pen_section
