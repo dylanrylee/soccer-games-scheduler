@@ -8,7 +8,22 @@ import sys
 
 def parse_input(file_path: str) -> Tuple[List[Slot], List[Game], List[Practice], Dict[str, List]]:
     """
-    Parses the input file to extract game slots, practice slots, games, practices, and constraints.
+    Parses the input file to extract slots, games, practices, and constraints.
+
+    Args:
+        file_path (str): The path to the input file.
+
+    Returns:
+        Tuple[List[Slot], List[Game], List[Practice], Dict[str, List]]:
+            - List of slots (both game and practice slots).
+            - List of games.
+            - List of practices.
+            - Dictionary of constraints, including:
+                - "not_compatible": List of incompatible pairs.
+                - "unwanted": List of unwanted slot assignments.
+                - "pair": List of preferred pairs.
+                - "preferences": List of slot preferences with penalties.
+                - "part_assign": List of partial assignments.
     """
     with open(file_path, 'r') as file:
         lines = file.readlines()
@@ -130,16 +145,29 @@ def parse_input(file_path: str) -> Tuple[List[Slot], List[Game], List[Practice],
     }
     return slots, games, practices, constraints
 
-# Recursively explore the tree, depth first
 def TraverseTree(current_node: AndTreeNode, hard_constraints: HardConstraints, soft_constraints: SoftConstraints) -> List[AndTreeNode]:
+    """
+    Recursively explores the scheduling tree in a depth-first manner.
+
+    Args:
+        current_node (AndTreeNode): The current node in the tree.
+        hard_constraints (HardConstraints): The hard constraints to validate assignments.
+        soft_constraints (SoftConstraints): The soft constraints to evaluate the schedules.
+
+    Returns:
+        List[AndTreeNode]: A list of completed schedules that satisfy all constraints.
+    """
+    
     # Initialize empty lists
     completed_schedules: List[AndTreeNode] = []
     unchecked_leaves: List[AndTreeNode] = []
 
     # Generate valid child nodes, checking against hard constraints
     current_node.expand(constrained_expansion_logic, hard_constraints)
+    print("Eval: ", soft_constraints.eval(current_node))
+    current_node.print_node()
     
-    # If none were generated, check to see if this is a full schedule. If so, return it
+    # If none were generated, check to see if this is a full schedule. If so, rSeturn it
     if not current_node.children:
         if (len(current_node.get_remaining_games()) == 0
             and len(current_node.get_remaining_practices()) == 0):
@@ -160,8 +188,14 @@ def TraverseTree(current_node: AndTreeNode, hard_constraints: HardConstraints, s
 
     return completed_schedules
 
-# If a full schedule exists, display the best one. Otherwise, declare there is no valid solution
 def PrintBestSchedule(completed_schedules: List[AndTreeNode], soft_constraints: SoftConstraints):
+    """
+    Prints the best schedule from a list of completed schedules.
+
+    Args:
+        completed_schedules (List[AndTreeNode]): List of valid schedules.
+        soft_constraints (SoftConstraints): Soft constraints for evaluation.
+    """
     if completed_schedules:
         best_schedule = min(completed_schedules, key=soft_constraints.eval)
 
@@ -213,7 +247,7 @@ if __name__ == "__main__":
         debug=False
     )
 
-    # SoftConstraints
+    # Initialize soft constraints
     soft_constraints = SoftConstraints(
         pen_game_min=int(pen_game_min),
         pen_practice_min=int(pen_practice_min),
