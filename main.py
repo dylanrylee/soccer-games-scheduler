@@ -167,7 +167,7 @@ def TraverseTree(current_node: AndTreeNode, hard_constraints: HardConstraints, s
     print("Eval: ", soft_constraints.eval(current_node))
     current_node.print_node()
     
-    # If none were generated, check to see if this is a full schedule. If so, rSeturn it
+    # If none were generated, check to see if this is a full schedule. If so, return it
     if not current_node.children:
         if (len(current_node.get_remaining_games()) == 0
             and len(current_node.get_remaining_practices()) == 0):
