@@ -15,6 +15,9 @@ Replace all bracketed text with the corresponding info. For example, [filename] 
 Note that the brackets are purely for clarity in this document, and should not be included in the terminal command
 
 RESULTS:
+
+There was not enough time for us to run and wait for the whole search to finish to find the best optimal schedule, so this is the best we could get. (apologies)
+
 CPSC433F24-LargeInput1.txt ->
 Eval:  7935
 Node at Depth 48:
