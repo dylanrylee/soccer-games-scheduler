@@ -80,8 +80,8 @@ class AndTreeNode:
                     # print("")
                     # print(f"Outside {new_slots}")
                     # Create a new child node with the updated slots, games, practices, and increment the depth by 1
-                    new_node = AndTreeNode(new_slots, self.games, self.practices, self.depth + 1)
-                    # new_node = AndTreeNode(new_slots, new_games, self.practices, self.depth + 1)
+                    # Fixed: Use new_games instead of self.games to prevent shared state bug
+                    new_node = AndTreeNode(new_slots, new_games, self.practices, self.depth + 1)
 
                     # constraints.debug = True
                     # print(new_node)
@@ -112,7 +112,7 @@ class AndTreeNode:
                             if cont == False:
                                 break
                     # self.assign_practice(new_practice, slot)
-                    # new_node = AndTreeNode(new_slots, self.games, self.practices, self.depth + 1)
+                    # Fixed: Use new_practices instead of self.practices to prevent shared state bug
                     new_node = AndTreeNode(new_slots, self.games, new_practices, self.depth + 1)
 
                     if constraints.constr(new_node.games, new_node.practices, new_node.slots):  # Stop if constraints are satisfied
