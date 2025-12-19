@@ -194,32 +194,16 @@ if __name__ == "__main__":
                                        main.slot_preferences, w_pref, main.pairs,
                                        pen_not_paired, w_pair, pen_section, w_sec_diff)
     
-    # print(hard_constraints)
-    # print("\n\n")
-    # print(soft_constraints)
-    
     root_node = AndTreeNode(main.slots, main.games, main.practices, 0)
     search_process = SearchProcess(root_node, hard_constraints, soft_constraints)
 
     print(f"Eval-value: {soft_constraints.eval(search_process)}")
-    # print(f"Result: {search_process}")
     games_and_practices = []
     for slot in search_process.slots:
         for game in slot.assigned_games:
             games_and_practices.append((game, slot.day, slot.start_time))
         for practice in slot.assigned_practices:
             games_and_practices.append((practice, slot.day, slot.start_time))
-    # sorted_games = sorted(main.games, key=lambda x: x.identifier)
-    # games_and_practices = []
-    # for game in sorted_games:
-    #     games_and_practices.append(game)
-    #     for practice in main.practices:
-    #         if practice.associated_game == game.identifier:
-    #             games_and_practices.append(practice)
+
     for elem in sorted(games_and_practices, key=lambda x: x[0]):
         print(elem[0] + ' ' * ( 30 - len(elem[0])) + ': ' + elem[1] + ', ' + elem[2])
-    
-
-    # Assign games and practices to slots
-    # main.assign_games_to_slots()
-    # main.assign_practices_to_slots()
