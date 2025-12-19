@@ -1,7 +1,20 @@
+"""
+Soccer Game Scheduler - Main Entry Point
+
+Parses input files containing scheduling requirements (games, practices, slots,
+and constraints), then runs a branch-and-bound search algorithm to find the
+optimal schedule that satisfies all hard constraints while minimizing soft
+constraint penalties.
+
+Usage:
+    python main.py input_file w_min_filled w_pref w_pair w_sec_diff \\
+                   pen_game_min pen_practice_min pen_not_paired pen_section
+"""
+
 from scheduler_structures import *
 from hard_constraints import *
 from soft_constraints import *
-from AndTreeNode import *
+from and_tree_node import *
 from search_process import *
 from typing import Dict, Tuple
 import sys
@@ -131,7 +144,6 @@ if __name__ == "__main__":
 
     # Create Practice objects from input strings and add them to Main
     for input_string in parsed_data['Practices']:
-        # practice = Practice.from_string(input_string)
         values = input_string.split()
         practice = Practice(input_string, f"{values[0]} {values[1]} {values[2]} {values[3]}", "")
         main.add_practice(practice)
@@ -141,10 +153,8 @@ if __name__ == "__main__":
         values = input_string.split(",")
         values[1] = values[1].lstrip()
         not_com = tuple(values)
-        # print(not_com)
         main.add_not_compatible(not_com)
 
-    # print("Unwanted")
     # Add unwanted pairs to Main
     for input_string in parsed_data['Unwanted']:
         values = input_string.split(",")
@@ -152,10 +162,7 @@ if __name__ == "__main__":
         values[2] = values[2].lstrip()
         slot = main.find_slot(values[1], values[2])
         pair = (values[0], slot)
-        # print(pair)
         main.add_unwanted(pair)
-        
-    # print("Slot preferences")
     # Add slot preferences to Main
     for input_string in parsed_data['Preferences']:
         values = input_string.split(",")
@@ -163,16 +170,13 @@ if __name__ == "__main__":
         values[2] = values[2].lstrip()
         values[3] = values[3].lstrip()
         slot_pref = tuple(values)
-        # print(slot_pref)
         main.add_slot_preferences(slot_pref)
 
-    # print("Pair preferences")
     # Add pair preferences to Main
     for input_string in parsed_data['Pair']:
         values = input_string.split(",")
         values[1] = values[1].lstrip()
         pair = tuple(values)
-        # print(pair)
         main.add_pair(pair)
 
     # Add partial assignments to Main

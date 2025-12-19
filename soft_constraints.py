@@ -1,6 +1,22 @@
+"""
+Soft Constraints for Soccer Scheduling
+
+Defines penalty-based constraints used to optimize schedule quality.
+These are preferences that should be satisfied when possible, but violations
+result in penalty points rather than invalid schedules.
+
+Soft constraints include:
+- Minimum slot fill preferences (prefer filling slots to minimum capacity)
+- Slot preferences for specific games/practices
+- Pairing preferences (certain games/practices should be together)
+- Division separation preferences (avoid scheduling different divisions together)
+
+The evaluation function calculates total penalty, with lower scores being better.
+"""
+
 from typing import List, Tuple
 from scheduler_structures import *
-from AndTreeNode import *
+from and_tree_node import *
 
 class SoftConstraints:
     def __init__(self, pen_game_min: int, pen_practice_min: int, w_min_filled: int,

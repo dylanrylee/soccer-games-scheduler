@@ -1,3 +1,16 @@
+"""
+Core Data Structures for Soccer Scheduling
+
+Defines the fundamental entities used throughout the scheduling system:
+
+- Slot: Represents a time slot with capacity constraints (max/min games and practices)
+- Game: Represents a soccer match that needs to be scheduled
+- Practice: Represents a practice session associated with a specific game
+
+These classes maintain the state of assignments and provide methods for
+assigning games/practices to slots.
+"""
+
 from typing import List, Optional, Union
 import copy
 
@@ -5,16 +18,6 @@ class Slot:
     """
     Represents a time slot (s ∈ S).
     """
-    # def __init__(self, day: str, start_time: str, max_games: int, min_games: int, max_practices: int, min_practices: int):
-    #     self.day = day                              
-    #     self.start_time = start_time                # Start time in "HH:MM" format
-    #     self.max_games = max_games
-    #     self.min_games = min_games
-    #     self.max_practices = max_practices
-    #     self.min_practices = min_practices
-    #     self.assigned_games: List[str] = []
-    #     self.assigned_practices: List[str] = []
-
     def __init__(self, day: str, start_time: str, max_games: int, min_games: int, max_practices: int, min_practices: int, assigned_games: List[str] = [], assigned_practices: List[str] = []):
         self.day = day                              
         self.start_time = start_time                # Start time in "HH:MM" format

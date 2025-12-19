@@ -1,3 +1,15 @@
+"""
+Hard Constraints for Soccer Scheduling
+
+Defines all mandatory constraints that must be satisfied for a valid schedule:
+- Slot capacity limits (max games/practices per slot)
+- No simultaneous assignments (game and its practice can't overlap)
+- Respect explicit assignments and exclusions
+- City-specific rules (evening divisions, admin meetings, tryout bookings)
+
+All constraints must return True for a schedule to be considered valid.
+"""
+
 from typing import List, Tuple
 from scheduler_structures import Game, Practice, Slot
 

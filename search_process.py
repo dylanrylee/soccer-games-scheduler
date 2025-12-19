@@ -1,7 +1,14 @@
+"""
+Branch-and-Bound Search Algorithm
+
+Implements exhaustive tree search with pruning to find optimal scheduling
+solutions that minimize soft constraint violations.
+"""
+
 from typing import List, Tuple, Optional
 from scheduler_structures import *
 from soft_constraints import *
-from AndTreeNode import *
+from and_tree_node import *
 import math
 
 class BranchAndBound:
