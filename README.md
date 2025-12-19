@@ -1,6 +1,6 @@
 # Soccer Match Schedule Optimizer
 
-Built using Python and a branch-and-bound search algorithm with constraint satisfaction, this project generates optimal soccer game schedules under real-world constraints such as team availability, field times, and referee assignments.
+A branch-and-bound search algorithm with constraint satisfaction, this project generates optimal soccer game schedules under real-world constraints such as team availability, field times, and referee assignments.
 
 This project was developed as a term assignment (Sep–Dec 2024) by a 5→3 member team. The goal was to implement an AI-based scheduler capable of solving complex constraint satisfaction problems using advanced algorithmic techniques.
 
